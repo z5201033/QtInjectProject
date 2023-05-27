@@ -34,3 +34,6 @@
 /QtClassLibraryInject/lib
 /QtClassLibraryInject/QtClassLibraryInject/x64
 /QtClassLibraryInject/QtWidgetsAppDemo/x64
+/MFCInject/x64
+/MFCInject/MFCLibraryInject/*.aps
+/MFCInject/MFCInject/*.aps
