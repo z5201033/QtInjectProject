@@ -49,4 +49,6 @@ public:
 	afx_msg void OnBnClickedBtnRefresh();
 	afx_msg void OnBnClickedBtnExplore();
 	afx_msg void OnBnClickedBtnInject();
+	afx_msg void OnDropFiles(HDROP hDropInfo);
+	CEdit m_editDllPath;
 };

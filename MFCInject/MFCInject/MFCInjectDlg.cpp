@@ -61,6 +61,7 @@ CMFCInjectDlg::CMFCInjectDlg(CWnd* pParent /*=nullptr*/)
 void CMFCInjectDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_EDIT_DLLPATH, m_editDllPath);
 }
 
 BEGIN_MESSAGE_MAP(CMFCInjectDlg, CDialogEx)
@@ -72,6 +73,7 @@ BEGIN_MESSAGE_MAP(CMFCInjectDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_REFRESH, &CMFCInjectDlg::OnBnClickedBtnRefresh)
 	ON_BN_CLICKED(IDC_BTN_EXPLORE, &CMFCInjectDlg::OnBnClickedBtnExplore)
 	ON_BN_CLICKED(IDC_BTN_INJECT, &CMFCInjectDlg::OnBnClickedBtnInject)
+	ON_WM_DROPFILES()
 END_MESSAGE_MAP()
 
 
@@ -340,4 +342,21 @@ bool CMFCInjectDlg::RemoteThreadInject(DWORD dwProcessID, const CStringW& dllPat
 	::VirtualFreeEx(hProcess, pBuf, 0, MEM_FREE);
 	::CloseHandle(hProcess);
 	return true;
+}
+
+void CMFCInjectDlg::OnDropFiles(HDROP hDropInfo)
+{
+	POINT gcPosition = { 0 };
+	::GetCursorPos(&gcPosition);
+
+	CRect rect = { 0 };
+	m_editDllPath.GetWindowRect(&rect);
+	if (rect.PtInRect(gcPosition))
+	{
+		TCHAR szPath[1024] = { 0 };
+		DragQueryFile(hDropInfo, 0, szPath, 1024);
+		SetDlgItemText(IDC_EDIT_DLLPATH, szPath);
+	}
+
+	CDialogEx::OnDropFiles(hDropInfo);
 }

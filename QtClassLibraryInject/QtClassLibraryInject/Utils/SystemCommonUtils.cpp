@@ -1,4 +1,4 @@
-#include "SystemCommonUtils.h"
+ï»¿#include "SystemCommonUtils.h"
 
 #include <tlhelp32.h>
 
@@ -16,7 +16,7 @@ bool SystemCommonUtils::getMainThreadIdFromProcessId(DWORD dwPId, DWORD& dwTId)
 	{
 		do
 		{
-			if (dwPId == te.th32OwnerProcessID)      // ÈÏÎªÕÒµ½µÄµÚÒ»¸ö¸Ã½ø³ÌµÄÏß³ÌÎªÖ÷Ïß³Ì
+			if (dwPId == te.th32OwnerProcessID)      // è®¤ä¸ºæ‰¾åˆ°çš„ç¬¬ä¸€ä¸ªè¯¥è¿›ç¨‹çš„çº¿ç¨‹ä¸ºä¸»çº¿ç¨‹
 			{
 				dwTId = te.th32ThreadID;
 				ret = true;
@@ -36,7 +36,7 @@ void SystemCommonUtils::initCurrentMainThreadId(DWORD* dwTId/* = nullptr*/)
 
 	if (dwTId && *dwTId != 0 && *dwTId != -1)
 	{
-		m_mainThreadId == *dwTId;
+		m_mainThreadId = *dwTId;
 		return;
 	}
 

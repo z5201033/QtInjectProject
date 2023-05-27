@@ -37,3 +37,6 @@
 /MFCInject/x64
 /MFCInject/MFCLibraryInject/*.aps
 /MFCInject/MFCInject/*.aps
+/MFCInject/MFCInject/x64
+/MFCInject/MFCLibraryInject/x64
+/QtClassLibraryInject/x64
