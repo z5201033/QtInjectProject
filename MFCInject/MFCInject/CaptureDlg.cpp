@@ -12,7 +12,7 @@ struct CaptureDlgPrivate
 
 	static void showWindow(HWND hwnd);
 	static void hideWindow(HWND hwnd);
-	static LRESULT wndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK wndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 };
 
 void CaptureDlgPrivate::showWindow(HWND hwnd)

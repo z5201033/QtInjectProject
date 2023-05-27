@@ -40,3 +40,10 @@
 /MFCInject/MFCInject/x64
 /MFCInject/MFCLibraryInject/x64
 /QtClassLibraryInject/x64
+/app
+/MFCInject/obj
+/QtClassLibraryInject/obj
+/QtClassLibraryInject/QtClassLibraryInject/Debug
+/QtClassLibraryInject/QtClassLibraryInject/Release
+/QtClassLibraryInject/QtWidgetsAppDemo/Debug
+/QtClassLibraryInject/QtWidgetsAppDemo/Release

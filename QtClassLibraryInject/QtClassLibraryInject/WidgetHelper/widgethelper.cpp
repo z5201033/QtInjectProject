@@ -1119,10 +1119,10 @@ void WidgetInfoModifier::initUI()
 
 	m_tabWidget = new QTabWidget(this);
 	m_tabWidget->setContentsMargins(0, 0, 0, 0);
-	m_tabWidget->setStyleSheet("QTabWidget#tabWidget{background:transparent;}\
-								QTabWidget::pane{border:0px;}\
-                                 QTabBar::tab{background-color:#1F1F1F;color:#999999;}\
-                                 QTabBar::tab::selected{background-color:#0F0F0F;color:#EEEEEE;}");
+// 	m_tabWidget->setStyleSheet("QTabWidget#tabWidget{background:transparent;}\
+// 								QTabWidget::pane{border:0px;}\
+//                                  QTabBar::tab{background-color:#1F1F1F;color:#999999;}\
+//                                  QTabBar::tab::selected{background-color:#0F0F0F;color:#EEEEEE;}");
 	m_tabWidget->addTab(addBaseInfoWidget(), "BaseInfo");
 	m_tabWidget->addTab(addStyleSheetWidget(), "StyleSheet");
 
@@ -1163,8 +1163,8 @@ QWidget* WidgetInfoModifier::addBaseInfoWidget()
 QWidget* WidgetInfoModifier::addStyleSheetWidget()
 {
 	QWidget* widget = new QWidget(this);
-	widget->setObjectName("BaseInfoWidget");
-	widget->setStyleSheet("QWidget#BaseInfoWidget{background:transparent;}");
+	widget->setObjectName("StyleSheetWidget");
+	widget->setStyleSheet("QWidget#StyleSheetWidget{background:transparent;}");
 	QVBoxLayout* layout = new QVBoxLayout(widget);
 
 	QTextEdit* textEdit = new QTextEdit(widget);

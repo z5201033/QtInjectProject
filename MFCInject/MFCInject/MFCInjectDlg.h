@@ -22,6 +22,7 @@ public:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
 	static CString generateErrorInfo(const CString& customError = _T(""));
 	static bool RemoteThreadInject(DWORD dwProcessID, const CStringW& dllPath, CString* strError = nullptr);
+	static CString getModuleDir();
 
 // 实现
 protected:

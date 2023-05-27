@@ -109,8 +109,7 @@ BOOL CMFCInjectDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-	//SetDlgItemTextW(IDC_EDIT_DLLPATH, CStringW(L"E:\\projectcode\\MFCInject\\x64\\Debug\\MFCLibraryInject.dll"));
-	SetDlgItemTextW(IDC_EDIT_DLLPATH, CStringW(L"E:\\projectcode\\QtClassLibraryInject\\x64\\Debug\\QtClassLibraryInject.dll"));
+	SetDlgItemTextW(IDC_EDIT_DLLPATH, getModuleDir() + CStringW(L"\\QtClassLibraryInject.dll"));
 
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
@@ -344,6 +343,19 @@ bool CMFCInjectDlg::RemoteThreadInject(DWORD dwProcessID, const CStringW& dllPat
 	return true;
 }
 
+CString CMFCInjectDlg::getModuleDir()
+{
+	HMODULE module = GetModuleHandle(NULL);
+	TCHAR pFileName[MAX_PATH] = { 0 };
+	GetModuleFileName(module, pFileName, MAX_PATH);
+	CString csFullName(pFileName);
+	int nPos = csFullName.ReverseFind('\\');
+	if (nPos < 0)
+		return CString("");
+	else
+		return csFullName.Left(nPos);
+}
+
 void CMFCInjectDlg::OnDropFiles(HDROP hDropInfo)
 {
 	POINT gcPosition = { 0 };
@@ -353,8 +365,8 @@ void CMFCInjectDlg::OnDropFiles(HDROP hDropInfo)
 	m_editDllPath.GetWindowRect(&rect);
 	if (rect.PtInRect(gcPosition))
 	{
-		TCHAR szPath[1024] = { 0 };
-		DragQueryFile(hDropInfo, 0, szPath, 1024);
+		TCHAR szPath[MAX_PATH] = { 0 };
+		DragQueryFile(hDropInfo, 0, szPath, MAX_PATH);
 		SetDlgItemText(IDC_EDIT_DLLPATH, szPath);
 	}
 
