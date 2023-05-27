@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <process.h>
 
+#include "QtHelper/QthMainWindow.h"
 #include "WidgetHelper/widgethelper.h"
 #include "Utils/SystemCommonUtils.h"
 
@@ -10,7 +11,7 @@ static DWORD g_dwMainTId = -1;
 static HHOOK g_hookMsg = NULL;
 static HHOOK g_hookKeyboard = NULL;
 static bool g_initWidgetHelper = false;
-static WidgetHelper* g_WidgetHelper = nullptr;
+static QWidget* g_WidgetHelper = nullptr;
 static const DWORD g_customMsg = WM_USER + 100;
 
 LRESULT CALLBACK MainThreadMsgProc(int nCode, WPARAM wParam, LPARAM lParam)
@@ -22,6 +23,7 @@ LRESULT CALLBACK MainThreadMsgProc(int nCode, WPARAM wParam, LPARAM lParam)
 	{
 		g_initWidgetHelper = true;
 		g_WidgetHelper = new WidgetHelper();
+		//g_WidgetHelper = new Qth::QthMainWindow();
 		g_WidgetHelper->show();
 		g_WidgetHelper->raise();
 

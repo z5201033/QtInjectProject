@@ -26,6 +26,9 @@
     <Filter Include="Utils">
       <UniqueIdentifier>{1c37a377-9105-4cc6-95ef-846e362a8127}</UniqueIdentifier>
     </Filter>
+    <Filter Include="QtHelper">
+      <UniqueIdentifier>{d4c4d076-3850-417c-8318-25bba76e145a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="QtClassLibraryInject.cpp">
@@ -37,6 +40,12 @@
     <ClCompile Include="Utils\SystemCommonUtils.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="QtHelper\QthMainWindow.cpp">
+      <Filter>QtHelper</Filter>
+    </ClCompile>
+    <ClCompile Include="QtHelper\QthWidgetHelper.cpp">
+      <Filter>QtHelper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WidgetHelper\widgethelper.cpp">
@@ -46,6 +55,12 @@
   <ItemGroup>
     <QtMoc Include="WidgetHelper\widgethelper.h">
       <Filter>WidgetHelper</Filter>
+    </QtMoc>
+    <QtMoc Include="QtHelper\QthMainWindow.h">
+      <Filter>QtHelper</Filter>
+    </QtMoc>
+    <QtMoc Include="QtHelper\QthWidgetHelper.h">
+      <Filter>QtHelper</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

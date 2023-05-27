@@ -4,6 +4,7 @@
 #include <QClipboard>
 #include <QGridLayout>
 #include <QHeaderView>
+#include <QMessageBox>
 #include <QLabel>
 #include <QListWidget>
 #include <QMenu>
@@ -1012,6 +1013,12 @@ QWidget* WidgetInfoModifier::addStyleSheetWidget()
 
 void WidgetInfoModifier::applyAllWidgetInfo()
 {
+	if (!m_targetWidget)
+	{
+		QMessageBox::information(this, "warning", "Current widget is invalid!");
+		return;
+	}
+
 	QTextEdit* textEdit = findChild<QTextEdit*>("StyleSheetEdit");
 	if (textEdit)
 	{

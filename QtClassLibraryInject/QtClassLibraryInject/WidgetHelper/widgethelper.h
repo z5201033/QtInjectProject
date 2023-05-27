@@ -88,8 +88,8 @@ private:
 	QMap<QString, int>	m_headerToIndex;
 	QTreeWidgetItem*	m_selectItemLast = nullptr;
 
-	TreeItemToWidget	m_treeItemToWidget;
-	WidgetToTreeItem	m_widgetToTreeItem;
+	TreeItemToWidget		m_treeItemToWidget;
+	WidgetToTreeItem		m_widgetToTreeItem;
 
 	WidgetInfoModifier* m_widgetInfoModifier = nullptr;
 };
