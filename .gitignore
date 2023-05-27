@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+.vs
+/QtClassLibraryInject/lib
+/QtClassLibraryInject/QtClassLibraryInject/x64
+/QtClassLibraryInject/QtWidgetsAppDemo/x64
