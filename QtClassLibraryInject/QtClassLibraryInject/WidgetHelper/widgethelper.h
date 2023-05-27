@@ -11,21 +11,6 @@
 #include <windows.h>
 #endif
 
-typedef QListWidget *(ListWidgetCastCallbackFunc)(QObject *);
-typedef std::function<ListWidgetCastCallbackFunc> ListWidgetCastFunc;
-void addListWidgetCast(ListWidgetCastFunc func);
-
-#define DEF_LIST_WIDGET_CAST_CALLBACK(Template) \
-QListWidget* Template##CallbackFunc(QObject *object) {\
-	QListWidget *listTemp = reinterpret_cast<QListWidget *>(qobject_cast<Template*>(object)); \
-		if (listTemp)\
-			return listTemp;\
-\
-	return nullptr;\
-}
-
-#define ADD_LIST_WIDGET_CAST(Template) addListWidgetCast(Template##CallbackFunc);
-
 class QTreeWidget;
 class QTreeWidgetItem;
 class TreeInfoWidgetHelper;
@@ -48,8 +33,6 @@ private:
 	bool createHighLightBtn(QVBoxLayout *mainLayout);
 	bool createSearchBtn(QVBoxLayout *mainLayout);
 	bool createTreeInfoBtn(QVBoxLayout* mainLayout);
-	void drawTargetBorder(QWidget *curWidget, QWidget *preWidget);
-	void drawTargetBorder(QWidget *curWidget, bool erase);
 	void reset();
 	void clearWidgetData();
 	void updateWidgetInfo(QWidget *curWidget);
@@ -62,7 +45,7 @@ private:
 	QTimer*		m_checkWidgetTimer = nullptr;
 	QTimer*		m_highLightTimer = nullptr;
 	int			m_highLightCount = 0;
-	QWidget*	m_highLightWidget = nullptr;
+	QWidget*		m_highLightWidget = nullptr;
 
 	QPointer<QWidget>	m_preWidget;
 	QPointer<QWidget>	m_curWidget;
@@ -71,6 +54,7 @@ private:
 	static LRESULT CALLBACK wndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 	HWND	m_hWnd = nullptr;
 #endif
+	QPointer<QWindow> m_CaptureWindow;
 
 	TreeInfoWidgetHelper* m_treeInfoWidget = nullptr;
 };

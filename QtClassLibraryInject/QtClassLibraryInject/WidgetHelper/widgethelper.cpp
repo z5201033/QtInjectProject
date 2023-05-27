@@ -12,6 +12,7 @@
 #include <QTreeWidget>
 #include <QTextEdit>
 #include <QScreen>
+#include <QWindow>
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -39,38 +40,10 @@
 #define Name_ParentAddr		"parentAddrObject"
 #define Name_ListCount		"listCount"			// 用于查询列表个数
 
-static QList<ListWidgetCastFunc> s_qListWidgetCastFuncList;
-void addListWidgetCast(ListWidgetCastFunc func)
-{
-	for (ListWidgetCastFunc funcTemp : s_qListWidgetCastFuncList)
-	{
-		if (*(funcTemp.target<ListWidgetCastCallbackFunc>()) == *(func.target<ListWidgetCastCallbackFunc>()))
-			return;
-	}
-
-	s_qListWidgetCastFuncList.append(func);
-}
-
-QListWidget* qListWidget_cast(QObject *object)
-{
-	QListWidget *listTemp = qobject_cast<QListWidget*>(object);
-	if (listTemp)
-		return listTemp;
-	
-	for (ListWidgetCastFunc func : s_qListWidgetCastFuncList)
-	{
-		listTemp = func(object);
-		if (listTemp)
-			return listTemp;
-	}
-
-	return nullptr;
-}
-
 static int HelperExptionFilter(unsigned int code, struct _EXCEPTION_POINTERS* ep)
 {
-    Q_UNUSED(code);
-    Q_UNUSED(ep);
+	Q_UNUSED(code);
+	Q_UNUSED(ep);
 	return EXCEPTION_EXECUTE_HANDLER;
 }
 
@@ -108,7 +81,6 @@ WidgetHelper::WidgetHelper(QWidget* parent)
 	createItem("Style Sheet", Name_StyleSheet, gridLayout);
 	createItem("Parent Address", Name_ParentAddr, gridLayout);
 	createItem("Parent Class Name", Name_ParentWidget, gridLayout);
-	createItem("List Count", Name_ListCount, gridLayout);
 	createShowHideBtn("set visible", "", gridLayout);
 	
 	mainLayout->addLayout(gridLayout);
@@ -301,63 +273,6 @@ bool WidgetHelper::createTreeInfoBtn(QVBoxLayout* mainLayout)
 	return true;
 }
 
-void WidgetHelper::drawTargetBorder(QWidget *curWidget, QWidget *preWidget)
-{
-#ifdef Q_OS_WIN
-	HDC hdc = ::GetDC(::GetDesktopWindow());
-
-	// The following function ensures that pixels of 
-	// the previously drawn line are set to white and 
-	// those of the new line are set to black. 
-	RECT rcCurWidget = {};
-	if (curWidget)
-	{
-		QRect curRect = curWidget->rect();
-		rcCurWidget = { curWidget->mapToGlobal(curRect.topLeft()).x()
-			, curWidget->mapToGlobal(curRect.topLeft()).y()
-			, curWidget->mapToGlobal(curRect.bottomRight()).x()
-			, curWidget->mapToGlobal(curRect.bottomRight()).y() };
-	}
-
-	RECT rcPreWidget = {};
-	if (preWidget)
-	{
-		QRect preRect = preWidget->rect();
-		rcPreWidget = { preWidget->mapToGlobal(preRect.topLeft()).x()
-		, preWidget->mapToGlobal(preRect.topLeft()).y()
-		, preWidget->mapToGlobal(preRect.bottomRight()).x()
-		, preWidget->mapToGlobal(preRect.bottomRight()).y() };
-	}
-
-	HPEN hPen = ::CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
-	HPEN hOldPen = (HPEN)::SelectObject(hdc, hPen);
-	HBRUSH hOldBrush = (HBRUSH)::SelectObject(hdc, ::GetStockObject(NULL_BRUSH));
-
-	::SetROP2(hdc, R2_NOTXORPEN);
-
-	// If a line was drawn during an earlier WM_MOUSEMOVE 
-	// message, draw over it. This erases the line by 
-	// setting the color of its pixels to white. 
-				// 这个方法是把前一次绘制的线清除掉，从而达到鼠标未释放前只绘制一条直线出来
-	if (preWidget && preWidget != this && preWidget->parentWidget() != this)
-	{
-		::Rectangle(hdc, rcPreWidget.left, rcPreWidget.top, rcPreWidget.right, rcPreWidget.bottom);
-	}
-
-	if (curWidget)
-	{
-		::Rectangle(hdc, rcCurWidget.left, rcCurWidget.top, rcCurWidget.right, rcCurWidget.bottom);
-	}
-	
-	// Set the previous line flag, save the ending 
-	// point of the new line, and then release the DC. 
-	::SelectObject(hdc, hOldBrush);
-	::SelectObject(hdc, hOldPen);
-	::DeleteObject(hPen);
-	::ReleaseDC(::GetDesktopWindow(), hdc);
-#endif
-}
-
 void WidgetHelper::reset()
 {
 	if (!m_checkWidgetTimer)
@@ -366,9 +281,8 @@ void WidgetHelper::reset()
 	m_checkWidgetTimer->stop();
 	m_preWidget = nullptr;
 	setCursor(Qt::ArrowCursor);
-#ifdef Q_OS_WIN
-	::ShowWindow(m_hWnd, SW_HIDE);
-#endif
+	if (m_CaptureWindow)
+		m_CaptureWindow->setVisible(false);
 }
 
 void WidgetHelper::clearWidgetData()
@@ -452,12 +366,6 @@ void WidgetHelper::clearWidgetData()
 
 	// 父对象信息
 	lineEdit = findChild<QLineEdit *>(Name_ParentAddr);
-	if (lineEdit)
-	{
-		lineEdit->setText("");
-	}
-
-	lineEdit = findChild<QLineEdit *>(Name_ListCount);
 	if (lineEdit)
 	{
 		lineEdit->setText("");
@@ -570,15 +478,6 @@ void WidgetHelper::updateWidgetInfo(QWidget *curWidget)
 		lineEdit->setText(QString("0x%1").arg(QString::number((quint64)parentObject, 16)));
 		lineEdit->setCursorPosition(0);
 	}
-
-	// 窗口标志信息
-	lineEdit = findChild<QLineEdit *>(Name_ListCount);
-	if (lineEdit)
-	{
-		QListWidget *listTemp = qListWidget_cast(curWidget);
-		if (listTemp)
-			lineEdit->setText(QString("%0").arg(listTemp->count()));
-	}
 }
 
 QWidget *WidgetHelper::convertAddrToWidget(quint64 addr)
@@ -631,37 +530,18 @@ void WidgetHelper::updateCaptureDlgPos(QWidget *widget)
 		return;
 	
 	QRect rect = widget->frameGeometry();
-	rect.moveTopLeft(widget->mapToGlobal(QPoint(0, 0)));
-	QScreen* sc = widget->screen();
-	if (sc && sc->handle())
+ 	rect.moveTopLeft(widget->mapToGlobal(QPoint(0, 0)));
+	if (m_CaptureWindow)
 	{
-		qreal pixelRatio = devicePixelRatio();
-		if (pixelRatio < 1.0)
-			pixelRatio = 1.0;
-		
-		QPoint scPosTopLeft = sc->geometry().topLeft();
-		QPoint posDst = (rect.topLeft() - scPosTopLeft) * pixelRatio + scPosTopLeft;
-		rect.setSize(rect.size() * pixelRatio);
-		rect.moveTopLeft(posDst);
+		m_CaptureWindow->setGeometry(rect);
+		m_CaptureWindow->showNormal();
 	}
-
-#ifdef Q_OS_WIN
-	::MoveWindow(m_hWnd, rect.x(), rect.y(), rect.width(), rect.height(), true);
-	if (!::IsWindowVisible(m_hWnd))
-	{
-		::ShowWindow(m_hWnd, SW_SHOWNOACTIVATE);
-	}
-#endif
 }
 
 void WidgetHelper::hideCaptureDlg()
 {
-#ifdef Q_OS_WIN
-	if (::IsWindow(m_hWnd))
-	{
-		::ShowWindow(m_hWnd, SW_HIDE);
-	}
-#endif
+	if (m_CaptureWindow)
+		m_CaptureWindow->hide();
 }
 
 #ifdef Q_OS_WIN
@@ -713,100 +593,56 @@ bool WidgetHelper::createCaptureDlg()
 	::SetWindowPos(m_hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 	::ShowWindow(m_hWnd, SW_HIDE);
 	::UpdateWindow(m_hWnd);
+
+	m_CaptureWindow = QWindow::fromWinId((WId)m_hWnd);
+
 	return true;
 }
 
 LRESULT WidgetHelper::wndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	//WidgetHelper *_this = (WidgetHelper *)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
-	//if (_this)
+	switch (message)
 	{
-		switch (message)
-		{
-		case WM_PAINT:
-		{
-			RECT rc = {};
-			::GetClientRect(hwnd, &rc);
-			int nWidth = rc.right;
-			int nHeight = rc.bottom;;
-			HDC hDC;
-			PAINTSTRUCT ps;
-			hDC = ::BeginPaint(hwnd, &ps);
-			HDC hMemDC = ::CreateCompatibleDC(NULL);//建立内存兼容DC
-			HBITMAP hBmpMem = ::CreateCompatibleBitmap(hDC, nWidth, nHeight);
-			::SelectObject(hMemDC, hBmpMem);
-			::SelectObject(hMemDC, ::GetStockObject(WHITE_BRUSH));
-			HPEN hPen = ::CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
-			::SelectObject(hMemDC, hPen);
+	case WM_PAINT:
+	{
+		RECT rc = {};
+		::GetClientRect(hwnd, &rc);
+		int nWidth = rc.right;
+		int nHeight = rc.bottom;;
+		HDC hDC;
+		PAINTSTRUCT ps;
+		hDC = ::BeginPaint(hwnd, &ps);
+		HDC hMemDC = ::CreateCompatibleDC(NULL);//建立内存兼容DC
+		HBITMAP hBmpMem = ::CreateCompatibleBitmap(hDC, nWidth, nHeight);
+		::SelectObject(hMemDC, hBmpMem);
+		::SelectObject(hMemDC, ::GetStockObject(WHITE_BRUSH));
+		HPEN hPen = ::CreatePen(PS_SOLID, 2, RGB(255, 0, 0));
+		::SelectObject(hMemDC, hPen);
 
-			::Rectangle(hMemDC, 0, 0, rc.right, rc.bottom);
-			::BitBlt(hDC, 0, 0, nWidth, nHeight, hMemDC, 0, 0, SRCCOPY);//将内存DC中的内容拷贝到当前窗口DC中,并显示
+		::Rectangle(hMemDC, 0, 0, rc.right, rc.bottom);
+		::BitBlt(hDC, 0, 0, nWidth, nHeight, hMemDC, 0, 0, SRCCOPY);//将内存DC中的内容拷贝到当前窗口DC中,并显示
 
 
-			::DeleteObject(hBmpMem);//删除对象
-			::DeleteObject(hPen);//删除对象
-			::DeleteDC(hMemDC);//删除DC；
+		::DeleteObject(hBmpMem);//删除对象
+		::DeleteObject(hPen);//删除对象
+		::DeleteDC(hMemDC);//删除DC；
 
-			::EndPaint(hwnd, &ps);
-		}
-		break;
-		case WM_ERASEBKGND:
-		{
-			return true;
-		}
-		break;
-		default:
-			break;
-		}
+		::EndPaint(hwnd, &ps);
 	}
+	break;
+	case WM_ERASEBKGND:
+	{
+		return true;
+	}
+	break;
+	default:
+		break;
+	}
+
 	return ::DefWindowProc(hwnd, message, wParam, lParam);
 }
 
 #endif
-
-void WidgetHelper::drawTargetBorder(QWidget *curWidget, bool erase)
-{
-#ifdef Q_OS_WIN
-	HDC hdc = ::GetDC(::GetDesktopWindow());
-
-	// The following function ensures that pixels of 
-	// the previously drawn line are set to white and 
-	// those of the new line are set to black. 
-	RECT rcCurWidget = {};
-	if (curWidget)
-	{
-		QRect curRect = curWidget->rect();
-		rcCurWidget = { curWidget->mapToGlobal(curRect.topLeft()).x()
-			, curWidget->mapToGlobal(curRect.topLeft()).y()
-			, curWidget->mapToGlobal(curRect.bottomRight()).x()
-			, curWidget->mapToGlobal(curRect.bottomRight()).y() };
-	}
-
-	HPEN hPen = ::CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
-	HPEN hOldPen = (HPEN)::SelectObject(hdc, hPen);
-	HBRUSH hOldBrush = (HBRUSH)::SelectObject(hdc, ::GetStockObject(NULL_BRUSH));
-
-	if (erase)
-	{
-		::SelectObject(hdc, ::GetStockObject(NULL_PEN));
-	}
-	// If a line was drawn during an earlier WM_MOUSEMOVE 
-	// message, draw over it. This erases the line by 
-	// setting the color of its pixels to white. 
-				// 这个方法是把前一次绘制的线清除掉，从而达到鼠标未释放前只绘制一条直线出来
-	if (curWidget)
-	{
-		::Rectangle(hdc, rcCurWidget.left, rcCurWidget.top, rcCurWidget.right, rcCurWidget.bottom);
-	}
-
-	// Set the previous line flag, save the ending 
-	// point of the new line, and then release the DC. 
-	::SelectObject(hdc, hOldBrush);
-	::SelectObject(hdc, hOldPen);
-	::DeleteObject(hPen);
-	::ReleaseDC(::GetDesktopWindow(), hdc);
-#endif
-}
 
 void WidgetHelper::onCheckTimeout()
 {
@@ -824,14 +660,13 @@ void WidgetHelper::onCheckTimeout()
 	if (!curWidget || (curWidget && ((curWidget == this) || curWidget->parentWidget() == this)))
 	{
 		clearWidgetData();
-#ifdef Q_OS_WIN
-		::ShowWindow(m_hWnd, SW_HIDE);
-#endif
+		if (m_CaptureWindow)
+			m_CaptureWindow->setVisible(false);
+
 		m_preWidget = nullptr;
 		return;
 	};
 
-	//drawTargetBorder(curWidget, m_preWidget);
 	m_preWidget = curWidget;
 	updateCaptureDlgPos(curWidget);
 	
