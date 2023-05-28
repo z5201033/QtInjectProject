@@ -1,4 +1,5 @@
 ﻿#include "QthMainWindow.h"
+#include "QthWidgetHelper.h"
 
 #include <QTabWidget>
 #include <QVBoxLayout>
@@ -31,11 +32,18 @@ namespace Qth
 		//                                  QTabBar::tab{background-color:#1F1F1F;color:#999999;}\
 		//                                  QTabBar::tab::selected{background-color:#0F0F0F;color:#EEEEEE;}");
 		m_tabWidget->addTab(addWidgetHelper(), "Widget");
+		m_tabWidget->addTab(addObjecttHelper(), "Object");
 
 		mainLayout->addWidget(m_tabWidget);
 	}
 
 	QWidget* QthMainWindow::addWidgetHelper()
+	{
+		return new WidgetHelper();
+	}
+
+
+	QWidget* QthMainWindow::addObjecttHelper()
 	{
 		return new QWidget();
 	}

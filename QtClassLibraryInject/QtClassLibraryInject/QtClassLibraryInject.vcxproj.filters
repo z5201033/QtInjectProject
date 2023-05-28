@@ -46,6 +46,9 @@
     <ClCompile Include="QtHelper\QthWidgetHelper.cpp">
       <Filter>QtHelper</Filter>
     </ClCompile>
+    <ClCompile Include="QtHelper\QthCaptureDlg.cpp">
+      <Filter>QtHelper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WidgetHelper\widgethelper.cpp">
@@ -60,6 +63,9 @@
       <Filter>QtHelper</Filter>
     </QtMoc>
     <QtMoc Include="QtHelper\QthWidgetHelper.h">
+      <Filter>QtHelper</Filter>
+    </QtMoc>
+    <QtMoc Include="QtHelper\QthCaptureDlg.h">
       <Filter>QtHelper</Filter>
     </QtMoc>
   </ItemGroup>

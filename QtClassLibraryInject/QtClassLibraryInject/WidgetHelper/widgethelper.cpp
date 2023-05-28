@@ -531,7 +531,7 @@ void WidgetHelper::updateCaptureDlgPos(QWidget *widget)
 		return;
 	
 	QRect rect = widget->frameGeometry();
- 	rect.moveTopLeft(widget->mapToGlobal(QPoint(0, 0)));
+ 	rect.moveTopLeft(widget->mapToGlobal(QPoint(0, widget->height() - rect.height())));
 	if (m_CaptureWindow)
 	{
 		m_CaptureWindow->setGeometry(rect);

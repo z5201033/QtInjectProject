@@ -180,6 +180,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="QtHelper\QthCaptureDlg.cpp" />
     <ClCompile Include="QtHelper\QthMainWindow.cpp" />
     <ClCompile Include="QtHelper\QthWidgetHelper.cpp" />
     <ClCompile Include="Utils\SystemCommonUtils.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="..\Include\qtclasslibraryinject_global.h" />
     <QtMoc Include="QtHelper\QthMainWindow.h" />
     <QtMoc Include="QtHelper\QthWidgetHelper.h" />
+    <QtMoc Include="QtHelper\QthCaptureDlg.h" />
     <ClInclude Include="Utils\SystemCommonUtils.h" />
   </ItemGroup>
   <ItemGroup>

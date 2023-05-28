@@ -22,8 +22,8 @@ LRESULT CALLBACK MainThreadMsgProc(int nCode, WPARAM wParam, LPARAM lParam)
 	if (!g_initWidgetHelper)
 	{
 		g_initWidgetHelper = true;
-		g_WidgetHelper = new WidgetHelper();
-		//g_WidgetHelper = new Qth::QthMainWindow();
+		//g_WidgetHelper = new WidgetHelper();
+		g_WidgetHelper = new Qth::QthMainWindow();
 		g_WidgetHelper->show();
 		g_WidgetHelper->raise();
 
