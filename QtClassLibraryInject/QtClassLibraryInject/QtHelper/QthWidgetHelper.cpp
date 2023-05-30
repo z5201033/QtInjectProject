@@ -94,10 +94,10 @@ namespace Qth
 		classEdit->setFixedWidth(120);
 
 		QPushButton* findWidgetBtn = new QPushButton("SearchWidget", this);
-		findWidgetBtn->setFixedWidth(getContentWidth(findWidgetBtn->font(), "SearchWidget") + 8);
+		findWidgetBtn->setFixedWidth(getContentWidth(findWidgetBtn->font(), "SearchWidget") + 16);
 
 		QPushButton* refreshBtn = new QPushButton("RefreshTree", this);
-		refreshBtn->setFixedWidth(getContentWidth(refreshBtn->font(), "RefreshTree") + 8);
+		refreshBtn->setFixedWidth(getContentWidth(refreshBtn->font(), "RefreshTree") + 16);
 
 		hLayout->addWidget(pickerBtn);
 		hLayout->addSpacing(10);
