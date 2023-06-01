@@ -15,6 +15,10 @@
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
+
 namespace Qth
 {
 	const QString Name_PickBtn		= "pickBtnObject";
@@ -37,6 +41,14 @@ namespace Qth
 		QRect rect = fontMetrics.boundingRect(str);
 		return rect.width();
 	}
+#ifdef Q_OS_WIN
+	static int HelperExptionFilter(unsigned int code, struct _EXCEPTION_POINTERS* ep)
+	{
+		Q_UNUSED(code);
+		Q_UNUSED(ep);
+		return EXCEPTION_EXECUTE_HANDLER;
+	}
+#endif
 
 	//////////////////////////////////////////////////////////////////////////
 	// WidgetHelper
@@ -185,7 +197,8 @@ namespace Qth
 
 	QWidget* WidgetHelper::convertAddrToWidget(quint64 addr)
 	{
-		try
+#ifdef Q_OS_WIN
+		__try
 		{
 			QWidget* curWidget = qobject_cast<QWidget*>((QObject*)addr);
 			if (!curWidget)
@@ -195,10 +208,13 @@ namespace Qth
 
 			return curWidget;
 		}
-		catch (...)
+		__except (HelperExptionFilter(GetExceptionCode(), GetExceptionInformation()))
 		{
 			return nullptr;
 		}
+#else
+		return nullptr;
+#endif
 	}
 
 	void WidgetHelper::onHighLightWidget(QWidget* widget)
