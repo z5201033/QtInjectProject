@@ -49,6 +49,9 @@
     <ClCompile Include="QtHelper\QthCaptureDlg.cpp">
       <Filter>QtHelper</Filter>
     </ClCompile>
+    <ClCompile Include="QtHelper\QthWidgetDetails.cpp">
+      <Filter>QtHelper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WidgetHelper\widgethelper.cpp">
@@ -68,6 +71,9 @@
     <QtMoc Include="QtHelper\QthCaptureDlg.h">
       <Filter>QtHelper</Filter>
     </QtMoc>
+    <QtMoc Include="QtHelper\QthWidgetDetails.h">
+      <Filter>QtHelper</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\QtClassLibraryInject.h">
@@ -78,6 +84,9 @@
     </ClInclude>
     <ClInclude Include="Utils\SystemCommonUtils.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="QtHelper\QthWidgetDef.h">
+      <Filter>QtHelper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

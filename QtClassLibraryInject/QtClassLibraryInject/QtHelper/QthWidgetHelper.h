@@ -11,6 +11,7 @@ namespace Qth
 {
 	class CaptureDlgMgr;
 	class TreeInfoWidgetHelper;
+	class WidgetDetails;
 
 	//////////////////////////////////////////////////////////////////////////
 	// WidgetHelper
@@ -68,7 +69,8 @@ namespace Qth
 		void setItemInfo(QTreeWidgetItem* item, QWidget* node);
 		void addChildInfo(QTreeWidgetItem* parentItem, QWidget* parentWidget, bool recursion = true);
 		int itemDepth(QTreeWidgetItem* parentItem);
-		void showWidgetInfoDetialed(QWidget* widget);
+		void showMenu(QTreeWidgetItem* item, int column);
+		void showWidgetInfoDetailed(QWidget* widget);
 	private:
 		typedef QHash<QTreeWidgetItem*, QWidget*> TreeItemToWidget;
 		typedef QHash<QWidget*, QTreeWidgetItem*> WidgetToTreeItem;
@@ -80,5 +82,7 @@ namespace Qth
 
 		TreeItemToWidget		m_treeItemToWidget;
 		WidgetToTreeItem		m_widgetToTreeItem;
+
+		WidgetDetails*			m_widgetDetails = nullptr;
 	};
 }

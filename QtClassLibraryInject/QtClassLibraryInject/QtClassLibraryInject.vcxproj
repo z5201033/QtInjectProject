@@ -49,7 +49,7 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>6.4.2_msvc2019_64</QtInstall>
+    <QtInstall>5.15.2_msvc2019_64</QtInstall>
     <QtModules>core;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
@@ -59,7 +59,7 @@
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
-    <QtInstall>6.4.2_msvc2019_64</QtInstall>
+    <QtInstall>5.15.2_msvc2019_64</QtInstall>
     <QtModules>core;widgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
@@ -182,6 +182,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="QtHelper\QthCaptureDlg.cpp" />
     <ClCompile Include="QtHelper\QthMainWindow.cpp" />
+    <ClCompile Include="QtHelper\QthWidgetDetails.cpp" />
     <ClCompile Include="QtHelper\QthWidgetHelper.cpp" />
     <ClCompile Include="Utils\SystemCommonUtils.cpp" />
     <ClCompile Include="WidgetHelper\widgethelper.cpp" />
@@ -194,6 +195,8 @@
     <QtMoc Include="QtHelper\QthMainWindow.h" />
     <QtMoc Include="QtHelper\QthWidgetHelper.h" />
     <QtMoc Include="QtHelper\QthCaptureDlg.h" />
+    <QtMoc Include="QtHelper\QthWidgetDetails.h" />
+    <ClInclude Include="QtHelper\QthWidgetDef.h" />
     <ClInclude Include="Utils\SystemCommonUtils.h" />
   </ItemGroup>
   <ItemGroup>

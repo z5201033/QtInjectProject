@@ -1,5 +1,6 @@
 ﻿#include "QthWidgetHelper.h"
 #include "QthCaptureDlg.h"
+#include "QthWidgetDetails.h"
 
 #include <QApplication>
 #include <QClipboard>
@@ -330,22 +331,28 @@ namespace Qth
 
 		connect(m_treeInfo, &QTreeWidget::itemSelectionChanged, this, [=]() {
 			QTreeWidgetItem* curItem = m_treeInfo->currentItem();
-		if (m_selectItemLast == curItem)
-			return;
-		m_selectItemLast = curItem;
+			if (m_selectItemLast == curItem)
+				return;
+			m_selectItemLast = curItem;
 
-		highLightFunc(m_selectItemLast);
-			});
+			highLightFunc(m_selectItemLast);
+		});
 
 		connect(m_treeInfo, &QTreeWidget::itemDoubleClicked, this, [=](QTreeWidgetItem* item, int column) {
 			if (!item)
-			return;
+				return;
 
-			showWidgetInfoDetialed(m_treeItemToWidget[item]);
+			showWidgetInfoDetailed(m_treeItemToWidget[item]);
 		});
 
 		connect(m_treeInfo, &QTreeWidget::itemPressed, this, [=](QTreeWidgetItem* item, int column) {
-			if (!item)
+			showMenu(item, column);
+		});
+	}
+
+	void TreeInfoWidgetHelper::showMenu(QTreeWidgetItem* item, int column)
+	{
+		if (!item)
 			return;
 
 		if (QApplication::mouseButtons() != Qt::RightButton)
@@ -356,21 +363,25 @@ namespace Qth
 		QMenu* menu = new QMenu(this);
 		menu->addAction("copy item", [&]() {
 			QString coltext = item->text(column);
-		clip->setText(coltext);
-			});
+			clip->setText(coltext);
+		});
 		menu->addAction("copy row item", [&]() {
 			QString text;
-		for (int i = 0; i < item->columnCount(); i++)
-		{
-			text += item->text(i);
-			if (i != item->columnCount())
-				text += "  ";
-		}
-		clip->setText(text);
+			for (int i = 0; i < item->columnCount(); i++)
+			{
+				text += item->text(i);
+				if (i != item->columnCount())
+					text += "  ";
+			}
+			clip->setText(text);
+		});
+		menu->addAction("show widget detailed", [&]() {
+			QTimer::singleShot(10, this, [=]() {
+				showWidgetInfoDetailed(m_treeItemToWidget[item]);
 			});
+		});
 		menu->exec(QCursor::pos());
 		menu->deleteLater();
-			});
 	}
 
 	void TreeInfoWidgetHelper::clearAllInfo()
@@ -515,17 +526,17 @@ namespace Qth
 		item->setText(m_headerToIndex[Name_StyleSheet], sytlenew);
 	}
 
-	void TreeInfoWidgetHelper::showWidgetInfoDetialed(QWidget* widget)
+	void TreeInfoWidgetHelper::showWidgetInfoDetailed(QWidget* widget)
 	{
-// 		if (!m_widgetInfoModifier)
-// 		{
-// 			m_widgetInfoModifier = new WidgetInfoModifier(this);
-// 			connect(m_widgetInfoModifier, &WidgetInfoModifier::sigUpdateWidget, this, [=](QWidget* widget) {
-// 				setItemInfo(m_widgetToTreeItem[widget], widget);
-// 				});
-// 		}
-// 
-// 		m_widgetInfoModifier->setTargetWidget(widget);
-// 		m_widgetInfoModifier->show();
+		if (!m_widgetDetails)
+		{
+			m_widgetDetails = new WidgetDetails(this);
+			connect(m_widgetDetails, &WidgetDetails::sigNeedUpdateWidget, this, [=](QWidget* widget) {
+				setItemInfo(m_widgetToTreeItem[widget], widget);
+				});
+		}
+
+		m_widgetDetails->setTargetWidget(widget);
+		m_widgetDetails->show();
 	}
 }
