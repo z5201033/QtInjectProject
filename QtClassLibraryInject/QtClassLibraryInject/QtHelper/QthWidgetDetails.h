@@ -27,6 +27,7 @@ namespace Qth
 		void initUI();
 		QWidget* addBaseInfoWidget();
 		QWidget* addAttributeInfoWidget();
+		QWidget* addWindowFlagWidget();
 		QWidget* addStyleSheetWidget();
 
 		void applyBaseInfo(bool sendSignal = false, bool showErrorMsg = false);
@@ -34,6 +35,9 @@ namespace Qth
 
 		void applyAttribute(bool sendSignal = false, bool showErrorMsg = false);
 		void updateAttribute(bool showErrorMsg = false);
+
+		void applyWindowFlag(bool sendSignal = false, bool showErrorMsg = false);
+		void updateWindowFlag(bool showErrorMsg = false);
 
 		void applyStyleSheet(bool sendSignal = false, bool showErrorMsg = false);
 		void updateStyleSheet(bool showErrorMsg = false);

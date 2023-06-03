@@ -55,6 +55,9 @@
     <ClCompile Include="QtHelper\QthCommon.cpp">
       <Filter>QtHelper</Filter>
     </ClCompile>
+    <ClCompile Include="QtHelper\QthCustomListItem.cpp">
+      <Filter>QtHelper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WidgetHelper\widgethelper.cpp">
@@ -89,6 +92,9 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="QtHelper\QthCommon.h">
+      <Filter>QtHelper</Filter>
+    </ClInclude>
+    <ClInclude Include="QtHelper\QthCustomListItem.h">
       <Filter>QtHelper</Filter>
     </ClInclude>
   </ItemGroup>

@@ -499,7 +499,7 @@ namespace Qth
 
 		item->setText(m_headerToIndex[Name_Visible], QString("%0").arg(node->isVisible() ? "true" : "false"));
 		item->setText(m_headerToIndex[Name_Attribute], WidgetHelper::getWidgetAttributeString(node));
-		item->setText(m_headerToIndex[Name_WindowFlags], QString("0x%1").arg(QString::number(node->windowFlags(), 16)));
+		item->setText(m_headerToIndex[Name_WindowFlags], QString("0x%1").arg(QString::number((UINT)node->windowFlags(), 16)));
 
 		QString sytleSrc = node->styleSheet();
 		QString sytlenew = sytleSrc.remove(QRegularExpression("\r|\n|\\s"));

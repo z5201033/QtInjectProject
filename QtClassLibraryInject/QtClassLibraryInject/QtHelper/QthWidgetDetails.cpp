@@ -1,5 +1,6 @@
 ﻿#include "QthWidgetDetails.h"
 #include "QthCaptureDlg.h"
+#include "QthCustomListItem.h"
 #include "QthCommon.h"
 
 #include <QApplication>
@@ -16,10 +17,6 @@
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QMap>
-
-class QListWidget;
-class QListWidgetItem;
-class QTabWidget;
 
 namespace Qth
 {
@@ -44,34 +41,60 @@ namespace Qth
 		QListWidget*			m_attributeListWidget = nullptr;
 		AttributeItemMap		m_attributeItemMap;
 
+		// WindowFlag
+		typedef QMap<UINT/*Qt::WindowType*/, QListWidgetItem*> WindowTypeItemMap;
+		QListWidget*			m_windowFlagListWidget = nullptr;
+		WindowTypeItemMap	m_windowFlagItemMap;
+
 		// StyleSheet
 		QTextEdit*			m_styleSheetEdit = nullptr;
 	};
 
-	class AttributeListItem : public QListWidgetItem
+	static QString getWindowFlagSubItem(const QList<UINT>& list, const QMetaEnum& me)
 	{
-	public:
-		const static int s_arributeRole = Qt::UserRole;
+		if (list.size() < 3)
+			return QString();
 
-		explicit AttributeListItem(Qt::WidgetAttribute attri, QListWidget* listview = nullptr)
-			: QListWidgetItem(listview)
+		UINT curType = list.back();
+		QList<UINT> subList;
+		for (int i = list.size() - 2; i >= 1; i--)
 		{
-			setData(s_arributeRole, (int)attri);
+			if (~curType & list[i])
+				continue;
+
+			bool hadContain = false;
+			for (int j = 0; j < subList.size(); j++)
+			{
+				if (~subList[j] & list[i])
+					continue;
+
+				hadContain = true;
+				break;
+			}
+
+			if (!hadContain)
+				subList.push_back(list[i]);
 		}
 
-		bool operator<(const QListWidgetItem& other) const override
+		if (subList.size() == 0)
+			return QString();
+
+		QString strRet;
+		for (int i = 0; i < subList.size(); i++)
 		{
-			bool curCheck = checkState() == Qt::Checked;
-			bool otherCheck = other.checkState() == Qt::Checked;
-			if (curCheck != otherCheck)
-				return curCheck;
-
-			int curAttri = data(s_arributeRole).toInt();
-			int otherAttri = other.data(s_arributeRole).toInt();
-
-			return curAttri < otherAttri;
+			if (i > 0)
+				strRet += " | ";
+			strRet += QString::fromStdString(me.valueToKey(subList[i]));
+			curType &= ~subList[i];
 		}
-	};
+
+		if (curType)
+		{
+			strRet.insert(0, QString("0x%0 | ").arg(curType, 8, 16, QLatin1Char('0')));
+		}
+
+		return strRet;
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	// WidgetDetails
@@ -111,6 +134,7 @@ namespace Qth
 		d->m_tabWidget->setMovable(true);
 		d->m_tabWidget->addTab(addBaseInfoWidget(), "BaseInfo");
 		d->m_tabWidget->addTab(addAttributeInfoWidget(), "Attribute");
+		d->m_tabWidget->addTab(addWindowFlagWidget(), "WindowFlag");
 		d->m_tabWidget->addTab(addStyleSheetWidget(), "StyleSheet");
 
 		QHBoxLayout* hlayout = new QHBoxLayout(this);
@@ -238,6 +262,49 @@ namespace Qth
 		return d->m_attributeListWidget;
 	}
 
+	QWidget* WidgetDetails::addWindowFlagWidget()
+	{
+		d->m_windowFlagListWidget = new QListWidget(this);
+		d->m_windowFlagListWidget->setObjectName("addWindowFlagWidget");
+		d->m_windowFlagListWidget->setSortingEnabled(true);
+		d->m_windowFlagItemMap.clear();
+		
+		const QMetaObject* obj = qt_getEnumMetaObject(Qt::Widget);
+		const char* name = qt_getEnumName(Qt::Widget);
+		QMetaEnum me = obj->enumerator(obj->indexOfEnumerator(name));
+		QList<UINT> cacheList;
+		for (int i = 0; i < me.keyCount(); ++i)
+		{
+			Qt::WindowType type = static_cast<Qt::WindowType>(me.value(i));
+			if (d->m_windowFlagItemMap.count(type) > 0)
+				continue;
+			
+			UINT curType = (UINT)type;
+			QString text = QString("0x%0 %1").arg(curType, 8, 16, QLatin1Char('0')).arg(me.key(i));
+			cacheList.push_back(curType);
+			QString subItem = getWindowFlagSubItem(cacheList, me);
+			if (!subItem.isEmpty())
+			{
+				text += " = ";
+				text += subItem;
+			}
+
+			QListWidgetItem* item = new WindowsFlagListItem(type, d->m_windowFlagListWidget);
+			item->setCheckState(Qt::Unchecked);
+			item->setText(text);
+			if (type == Qt::Widget)
+			{
+				item->setCheckState(Qt::Checked);
+				item->setFlags(item->flags() & ~Qt::ItemIsUserCheckable);
+			}
+			d->m_windowFlagListWidget->addItem(item);
+			d->m_windowFlagItemMap[type] = item;
+		}
+
+		d->m_applyFuncList[d->m_windowFlagListWidget] = std::bind(&WidgetDetails::applyWindowFlag, this, std::placeholders::_1, std::placeholders::_2);
+		return d->m_windowFlagListWidget;
+	}
+
 	QWidget* WidgetDetails::addStyleSheetWidget()
 	{
 		QWidget* widget = new QWidget(this);
@@ -263,6 +330,7 @@ namespace Qth
 		}
 
 		emit sigNeedUpdateWidget(m_targetWidget);
+		onUpdateAllWidgetInfo();
 	}
 
 	void WidgetDetails::onUpdateAllWidgetInfo()
@@ -270,6 +338,7 @@ namespace Qth
 		updateBaseInfo();
 		updateStyleSheet();
 		updateAttribute();
+		updateWindowFlag();
 	}
 
 	void WidgetDetails::applyBaseInfo(bool sendSignal, bool showErrorMsg)
@@ -369,7 +438,10 @@ namespace Qth
 		}
 
 		if (sendSignal)
+		{
 			emit sigNeedUpdateWidget(m_targetWidget);
+			onUpdateAllWidgetInfo();
+		}
 	}
 
 	void WidgetDetails::updateStyleSheet(bool showErrorMsg)
@@ -398,7 +470,10 @@ namespace Qth
 		}
 
 		if (sendSignal)
+		{
 			emit sigNeedUpdateWidget(m_targetWidget);
+			onUpdateAllWidgetInfo();
+		}
 	}
 
 	void WidgetDetails::updateAttribute(bool showErrorMsg)
@@ -409,6 +484,46 @@ namespace Qth
 		for (; it != d->m_attributeItemMap.end(); ++it)
 		{
 			bool src = valid && m_targetWidget->testAttribute(it.key());
+			it.value()->setCheckState(src ? Qt::Checked : Qt::Unchecked);
+		}
+	}
+
+	void WidgetDetails::applyWindowFlag(bool sendSignal, bool showErrorMsg)
+	{
+		if (!checkTargetWidgetValid(showErrorMsg))
+			return;
+
+		Qt::WindowFlags flagsOld = m_targetWidget->windowFlags();
+		Qt::WindowFlags flagsNew;
+		auto it = d->m_windowFlagItemMap.begin();
+		for (; it != d->m_windowFlagItemMap.end(); ++it)
+		{
+			bool dst = it.value()->checkState() == Qt::Checked;
+			if (dst)
+				flagsNew |= static_cast<Qt::WindowType>(it.key());
+		}
+
+		if (flagsOld == flagsNew)
+			return;
+
+		m_targetWidget->setWindowFlags(flagsNew);
+
+		if (sendSignal)
+		{
+			emit sigNeedUpdateWidget(m_targetWidget);
+			onUpdateAllWidgetInfo();
+		}
+	}
+
+	void WidgetDetails::updateWindowFlag(bool showErrorMsg)
+	{
+		bool valid = checkTargetWidgetValid(showErrorMsg);
+
+		Qt::WindowFlags flags = valid ? m_targetWidget->windowFlags() : Qt::WindowFlags();
+		auto it = d->m_windowFlagItemMap.begin();
+		for (; it != d->m_windowFlagItemMap.end(); ++it)
+		{
+			bool src = it.key() == Qt::Widget || flags.testFlag(static_cast<Qt::WindowType>(it.key()));
 			it.value()->setCheckState(src ? Qt::Checked : Qt::Unchecked);
 		}
 	}
