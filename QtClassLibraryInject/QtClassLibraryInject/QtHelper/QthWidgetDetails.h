@@ -20,23 +20,23 @@ namespace Qth
 
 	private slots:
 		void onTargetVisibelStateChanged(int state);
+		void onApplyCurrentTab();
+		void onApplyAllWidgetInfo();
+		void onUpdateAllWidgetInfo();
 	private:
 		void initUI();
 		QWidget* addBaseInfoWidget();
 		QWidget* addAttributeInfoWidget();
 		QWidget* addStyleSheetWidget();
 
-		void applyAllWidgetInfo();
-		void updateAllWidgetInfo();
-
 		void applyBaseInfo(bool sendSignal = false, bool showErrorMsg = false);
 		void updateBaseInfo(bool showErrorMsg = false);
 
-		void applyStyleSheet(bool sendSignal = false, bool showErrorMsg = false);
-		void updateStyleSheet(bool showErrorMsg = false);
-
 		void applyAttribute(bool sendSignal = false, bool showErrorMsg = false);
 		void updateAttribute(bool showErrorMsg = false);
+
+		void applyStyleSheet(bool sendSignal = false, bool showErrorMsg = false);
+		void updateStyleSheet(bool showErrorMsg = false);
 
 		bool checkTargetWidgetValid(bool showErrorMsg = false);
 	private:

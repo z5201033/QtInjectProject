@@ -26,6 +26,7 @@ namespace Qth
 	struct WidgetDetailsrivate
 	{
 		QTabWidget* m_tabWidget = nullptr;
+		std::map<QWidget*, std::function<void(bool,bool)>> m_applyFuncList;
 
 		// BaseInfo
 		QLineEdit* m_biEditaddr = nullptr;
@@ -95,7 +96,7 @@ namespace Qth
 		setWindowTitle(titleText);
 
 		m_targetWidget = widget;
-		updateAllWidgetInfo();
+		onUpdateAllWidgetInfo();
 	}
 
 	void WidgetDetails::initUI()
@@ -116,20 +117,21 @@ namespace Qth
 		{
 			QPushButton* btnApply = new QPushButton(this);
 			btnApply->setFixedSize(70, 20);
-			btnApply->setText("Apply All");
+			btnApply->setText("Apply");
+			QPushButton* btnApplyAll = new QPushButton(this);
+			btnApplyAll->setFixedSize(70, 20);
+			btnApplyAll->setText("Apply All");
 			QPushButton* btnRefresh = new QPushButton(this);
 			btnRefresh->setFixedSize(70, 20);
 			btnRefresh->setText("Refresh");
 			hlayout->addStretch();
 			hlayout->addWidget(btnApply);
+			hlayout->addWidget(btnApplyAll);
 			hlayout->addWidget(btnRefresh);
 
-			connect(btnApply, &QPushButton::clicked, this, [=]() {
-				applyAllWidgetInfo();
-				});
-			connect(btnRefresh, &QPushButton::clicked, this, [=]() {
-				updateAllWidgetInfo();
-				});
+			connect(btnApply, &QPushButton::clicked, this, &WidgetDetails::onApplyCurrentTab);
+			connect(btnApplyAll, &QPushButton::clicked, this, &WidgetDetails::onApplyAllWidgetInfo);
+			connect(btnRefresh, &QPushButton::clicked, this, &WidgetDetails::onUpdateAllWidgetInfo);
 		}
 
 		mainLayout->addWidget(d->m_tabWidget);
@@ -204,6 +206,8 @@ namespace Qth
 
 		baseLayout->addLayout(gridLayout);
 		baseLayout->addStretch();
+
+		d->m_applyFuncList[baseWidget] = std::bind(& WidgetDetails::applyBaseInfo, this, std::placeholders::_1, std::placeholders::_2);
 		return baseWidget;
 	}
 
@@ -230,6 +234,7 @@ namespace Qth
 			d->m_attributeItemMap[type] = item;
 		}
 
+		d->m_applyFuncList[d->m_attributeListWidget] = std::bind(&WidgetDetails::applyAttribute, this, std::placeholders::_1, std::placeholders::_2);
 		return d->m_attributeListWidget;
 	}
 
@@ -243,22 +248,24 @@ namespace Qth
 		d->m_styleSheetEdit = new QTextEdit(widget);
 		layout->addWidget(d->m_styleSheetEdit);
 
+		d->m_applyFuncList[widget] = std::bind(&WidgetDetails::applyStyleSheet, this, std::placeholders::_1, std::placeholders::_2);
 		return widget;
 	}
 
-	void WidgetDetails::applyAllWidgetInfo()
+	void WidgetDetails::onApplyAllWidgetInfo()
 	{
 		if (!checkTargetWidgetValid(true))
 			return;
 
-		applyBaseInfo();
-		applyStyleSheet();
-		applyAttribute();
+		for (const auto& it : d->m_applyFuncList)
+		{
+			it.second(false, false);
+		}
 
 		emit sigNeedUpdateWidget(m_targetWidget);
 	}
 
-	void WidgetDetails::updateAllWidgetInfo()
+	void WidgetDetails::onUpdateAllWidgetInfo()
 	{
 		updateBaseInfo();
 		updateStyleSheet();
@@ -435,5 +442,16 @@ namespace Qth
 
 			updateAttribute();
 		} while (false);
+	}
+
+	void WidgetDetails::onApplyCurrentTab()
+	{
+		if (!d->m_tabWidget)
+			return;
+
+		QWidget* currentWidget = d->m_tabWidget->currentWidget();
+		auto find = d->m_applyFuncList.find(currentWidget);
+		if (find != d->m_applyFuncList.end())
+			find->second(true, true);
 	}
 }
