@@ -181,6 +181,7 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="QtHelper\QthCaptureDlg.cpp" />
+    <ClCompile Include="QtHelper\QthCommon.cpp" />
     <ClCompile Include="QtHelper\QthMainWindow.cpp" />
     <ClCompile Include="QtHelper\QthWidgetDetails.cpp" />
     <ClCompile Include="QtHelper\QthWidgetHelper.cpp" />
@@ -196,7 +197,7 @@
     <QtMoc Include="QtHelper\QthWidgetHelper.h" />
     <QtMoc Include="QtHelper\QthCaptureDlg.h" />
     <QtMoc Include="QtHelper\QthWidgetDetails.h" />
-    <ClInclude Include="QtHelper\QthWidgetDef.h" />
+    <ClInclude Include="QtHelper\QthCommon.h" />
     <ClInclude Include="Utils\SystemCommonUtils.h" />
   </ItemGroup>
   <ItemGroup>

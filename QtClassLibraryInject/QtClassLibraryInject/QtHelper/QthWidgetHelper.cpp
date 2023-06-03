@@ -1,6 +1,7 @@
 ﻿#include "QthWidgetHelper.h"
 #include "QthCaptureDlg.h"
 #include "QthWidgetDetails.h"
+#include "QthCommon.h"
 
 #include <QApplication>
 #include <QClipboard>
@@ -14,10 +15,6 @@
 #include <QTimer>
 #include <QTreeWidget>
 #include <QVBoxLayout>
-
-#ifdef Q_OS_WIN
-#include <windows.h>
-#endif
 
 namespace Qth
 {
@@ -34,21 +31,6 @@ namespace Qth
 	const QString Name_StyleSheet	= "stylesheetObject";
 	const QString Name_ParentWidget	= "parentWidgetObject";
 	const QString Name_ParentAddr	= "parentAddrObject";
-
-	static int getContentWidth(QFont font, QString str)
-	{
-		QFontMetrics fontMetrics(font);
-		QRect rect = fontMetrics.boundingRect(str);
-		return rect.width();
-	}
-#ifdef Q_OS_WIN
-	static int HelperExptionFilter(unsigned int code, struct _EXCEPTION_POINTERS* ep)
-	{
-		Q_UNUSED(code);
-		Q_UNUSED(ep);
-		return EXCEPTION_EXECUTE_HANDLER;
-	}
-#endif
 
 	//////////////////////////////////////////////////////////////////////////
 	// WidgetHelper
@@ -95,22 +77,22 @@ namespace Qth
 		pickerBtn->setFocusPolicy(Qt::NoFocus);
 
 		QLabel* addrLabel = new QLabel("Address:", this);
-		addrLabel->setFixedWidth(getContentWidth(addrLabel->font(), "Address:") + 8);
+		addrLabel->setFixedWidth(getContentWidth(addrLabel->font(), "Address:").width() + 8);
 		QLineEdit* addrEdit = new QLineEdit(this);
 		addrEdit->setObjectName(Name_Addr);
 		addrEdit->setFixedWidth(80);
 
 		QLabel* classLabel = new QLabel("ClassName:", this);
-		classLabel->setFixedWidth(getContentWidth(classLabel->font(), "ClassName:") + 8);
+		classLabel->setFixedWidth(getContentWidth(classLabel->font(), "ClassName:").width() + 8);
 		QLineEdit* classEdit = new QLineEdit(this);
 		classEdit->setObjectName(Name_Class);
 		classEdit->setFixedWidth(120);
 
 		QPushButton* findWidgetBtn = new QPushButton("SearchWidget", this);
-		findWidgetBtn->setFixedWidth(getContentWidth(findWidgetBtn->font(), "SearchWidget") + 20);
+		findWidgetBtn->setFixedWidth(getContentWidth(findWidgetBtn->font(), "SearchWidget").width() + 20);
 
 		QPushButton* refreshBtn = new QPushButton("RefreshTree", this);
-		refreshBtn->setFixedWidth(getContentWidth(refreshBtn->font(), "RefreshTree") + 20);
+		refreshBtn->setFixedWidth(getContentWidth(refreshBtn->font(), "RefreshTree").width() + 20);
 
 		hLayout->addWidget(pickerBtn);
 		hLayout->addSpacing(10);
@@ -193,28 +175,6 @@ namespace Qth
 		}
 			
 		return m_treeInfoWidgetHelper;
-	}
-
-	QWidget* WidgetHelper::convertAddrToWidget(quint64 addr)
-	{
-#ifdef Q_OS_WIN
-		__try
-		{
-			QWidget* curWidget = qobject_cast<QWidget*>((QObject*)addr);
-			if (!curWidget)
-			{
-				return nullptr;
-			}
-
-			return curWidget;
-		}
-		__except (HelperExptionFilter(GetExceptionCode(), GetExceptionInformation()))
-		{
-			return nullptr;
-		}
-#else
-		return nullptr;
-#endif
 	}
 
 	void WidgetHelper::onHighLightWidget(QWidget* widget)
@@ -336,7 +296,7 @@ namespace Qth
 
 			QString addrString = item->text(m_headerToIndex[Name_Addr]);
 			quint64 addr = addrString.toULongLong(nullptr, 16);
-			QWidget* curWidget = WidgetHelper::convertAddrToWidget(addr);
+			QWidget* curWidget = convertAddrToWidget(addr);
 			if (curWidget)
 				emit sigHighLightWidget(curWidget);
 		};
@@ -524,13 +484,17 @@ namespace Qth
 		item->setText(m_headerToIndex[Name_Class], QString::fromStdString(node->metaObject()->className()));
 		item->setText(m_headerToIndex[Name_ObjectName], QString("%0 :(%1)").arg(node->objectName()).arg(node->windowTitle()));
 
+		QRect frameRect = node->frameGeometry();
+		QRect clientRect = node->rect();
+		QPoint posTopLeft = node->mapToGlobal(QPoint(clientRect.width() - frameRect.width(), clientRect.height() - frameRect.height()));
+		frameRect.moveTo(posTopLeft);
 		QRect curRect = node->rect();
 		QString rectShow = QString("(%0,%1)(%2,%3) - w:h(%4,%5)")
-			.arg(node->mapToGlobal(curRect.topLeft()).x())
-			.arg(node->mapToGlobal(curRect.topLeft()).y())
-			.arg(node->mapToGlobal(curRect.bottomRight()).x())
-			.arg(node->mapToGlobal(curRect.bottomRight()).y())
-			.arg(node->width()).arg(node->height());
+			.arg(frameRect.x())
+			.arg(frameRect.y())
+			.arg(frameRect.right())
+			.arg(frameRect.bottom())
+			.arg(frameRect.width()).arg(frameRect.height());
 		item->setText(m_headerToIndex[Name_Rect], rectShow);
 
 		item->setText(m_headerToIndex[Name_Visible], QString("%0").arg(node->isVisible() ? "true" : "false"));
@@ -553,6 +517,6 @@ namespace Qth
 		}
 
 		m_widgetDetails->setTargetWidget(widget);
-		m_widgetDetails->show();
+		m_widgetDetails->showNormal();
 	}
 }

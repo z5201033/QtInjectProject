@@ -10,6 +10,8 @@ namespace Qth
 		: QDialog(parent)
 	{
 		setWindowTitle("QtHelper");
+		setWindowFlag(Qt::WindowMinMaxButtonsHint);
+
 		resize(1080, 800);
 		initUI();
 	}

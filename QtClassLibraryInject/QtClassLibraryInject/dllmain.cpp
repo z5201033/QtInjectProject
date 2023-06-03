@@ -14,6 +14,7 @@ static bool g_initWidgetHelper = false;
 static QWidget* g_WidgetHelper = nullptr;
 static const DWORD g_customMsg = WM_USER + 100;
 
+
 LRESULT CALLBACK MainThreadMsgProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
 	if (::GetCurrentThreadId() != g_dwMainTId)
@@ -22,7 +23,9 @@ LRESULT CALLBACK MainThreadMsgProc(int nCode, WPARAM wParam, LPARAM lParam)
 	if (!g_initWidgetHelper)
 	{
 		g_initWidgetHelper = true;
-		//g_WidgetHelper = new WidgetHelper();
+		g_WidgetHelper = new WidgetHelper();
+		g_WidgetHelper->show();
+		g_WidgetHelper->raise();
 		g_WidgetHelper = new Qth::QthMainWindow();
 		g_WidgetHelper->show();
 		g_WidgetHelper->raise();

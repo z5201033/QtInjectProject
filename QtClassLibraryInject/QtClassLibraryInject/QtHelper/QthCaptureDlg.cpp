@@ -72,7 +72,7 @@ namespace Qth
 			return;
 
 		QRect rect = m_targetWidget->frameGeometry();
-		rect.moveTopLeft(m_targetWidget->mapToGlobal(QPoint(0, m_targetWidget->height() - rect.height())));
+		rect.moveTo(m_targetWidget->mapToGlobal(QPoint(m_targetWidget->width() - rect.width(), m_targetWidget->height() - rect.height())));
 		if (m_captureDlg)
 		{
 			m_captureDlg->setGeometry(rect);

@@ -24,7 +24,6 @@ namespace Qth
 
 	public:
 		static QString getWidgetAttributeString(QWidget* curWidget);
-		static QWidget* convertAddrToWidget(quint64 addr);
 
 	protected slots:
 		void onPickerBtnPressed();
