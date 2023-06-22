@@ -1,0 +1,7 @@
+1、编译
+直接运行对应项目下的.sln文件即可，QtInjectProject需要更改qt环境
+2、自动编译脚本
+RebuildAll.bat
+RebuildMFCInject.bat
+RebuildQtClassLibraryInject.bat
+需要自己修改其中的x86_amd64的路径
