@@ -2,6 +2,7 @@
 // Windows 头文件
 #include <windows.h>
 #include <process.h>
+#include <QApplication>
 
 #include "QtHelper/QthMainWindow.h"
 #include "WidgetHelper/widgethelper.h"
@@ -41,6 +42,37 @@ LRESULT CALLBACK MainThreadMsgProc(int nCode, WPARAM wParam, LPARAM lParam)
 	return CallNextHookEx(g_hookMsg, nCode, wParam, lParam);
 }
 
+void RaiseWidgetHelper()
+{
+	for(QWidget* pwidget : QApplication::topLevelWidgets())
+	{
+		if ((pwidget->isWindow()) && (pwidget->windowModality() == Qt::WindowModality::ApplicationModal))
+		{
+			if (g_WidgetHelper->parentWidget() == pwidget)
+				break;
+
+			Qt::WindowFlags flags = g_WidgetHelper->windowFlags();
+			g_WidgetHelper->setParent(pwidget);
+			g_WidgetHelper->setWindowFlags(flags);
+			g_WidgetHelper->connect(pwidget, &QObject::destroyed, g_WidgetHelper, [&](QObject* parent) {
+				if (g_WidgetHelper->parent() == parent)
+				{
+					bool visible = g_WidgetHelper->isVisible();
+					QRect rectOld = g_WidgetHelper->geometry();
+					g_WidgetHelper->setParent(nullptr);
+					g_WidgetHelper->setGeometry(rectOld);
+					g_WidgetHelper->setVisible(visible);
+				}
+			});
+
+			break;
+		}
+	}
+
+	g_WidgetHelper->show();
+	g_WidgetHelper->raise();
+}
+
 LRESULT CALLBACK MainThreadKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
 	if (::GetCurrentThreadId() != g_dwMainTId)
@@ -60,8 +92,7 @@ LRESULT CALLBACK MainThreadKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 	if (((DWORD)lParam & 0x40000000) && (nCode == HC_ACTION)) {
 		if (wParam == 0x53 && (GetKeyState(VK_CONTROL) & 0x8000) && (GetKeyState(VK_SHIFT) & 0x8000)) // Ctrl + Shift + S
 		{
-			g_WidgetHelper->show();
-			g_WidgetHelper->raise();
+			RaiseWidgetHelper();
 		}
 	}
 
@@ -105,20 +136,6 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 		HANDLE handle = (HANDLE)_beginthreadex(nullptr, 0, InjectThreadFunc, nullptr, 0, &threadId);
 		if (handle)
 			::CloseHandle(handle);
-
-// 		if (SystemCommonUtils::getCurrentMainThreadId(g_dwMainTId))
-// 		{
-// 			g_hookMsg = ::SetWindowsHookExW(WH_GETMESSAGE, MainThreadMsgProc, NULL, g_dwMainTId);
-// 			g_hookKeyboard = ::SetWindowsHookExW(WH_KEYBOARD, MainThreadKeyboardProc, NULL, g_dwMainTId);
-// 
-// 
-// 			// 考虑到其他线程进行注入
-// 			// 远程注入线程需弹窗停顿一会再退出，否则会导致消息勾子安装显示成功，但实际不生效(原因未知)
-// 			WCHAR msgText[260] = { 0 };
-// 			wsprintfW(msgText, L"inject success，main thread id(%lu) hook(%lu)(%lu) error(%lu)",
-// 				g_dwMainTId, g_hookMsg, g_hookKeyboard, ::GetLastError());
-// 			::MessageBoxW(NULL, msgText, L"inject box", MB_OK);
-// 		}
 	}
 		break;
 	case DLL_THREAD_ATTACH:
