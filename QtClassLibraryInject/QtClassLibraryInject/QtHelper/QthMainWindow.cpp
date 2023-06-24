@@ -1,7 +1,9 @@
 ﻿#include "QthMainWindow.h"
 #include "QthWidgetHelper.h"
 #include "QtHelperNetWorkExport.h"
+#include "QthCommon.h"
 
+#include <QDir>
 #include <QLabel>
 #include <QLibrary>
 #include <QTabWidget>
@@ -71,8 +73,16 @@ namespace Qth
 		networklayout->setContentsMargins(0, 0, 0, 0);
 		networklayout->setSpacing(0);
 
+		QString networkPath = "QtHelperNetWork";
+		QString currentPath = getCurrentModulePath();
+		if (!currentPath.isEmpty())
+		{
+			QFileInfo info(currentPath);
+			networkPath = QString("%0/%1").arg(info.absoluteDir().absolutePath()).arg("QtHelperNetWork");
+		}
+		
 		bool loadSuccessed = false;
-		generateQtHelperNetWorkWidgetFunc generateFunc = (generateQtHelperNetWorkWidgetFunc)QLibrary::resolve("QtHelperNetWork", "generateQtHelperNetWorkWidget");
+		generateQtHelperNetWorkWidgetFunc generateFunc = (generateQtHelperNetWorkWidgetFunc)QLibrary::resolve(networkPath, "generateQtHelperNetWorkWidget");
 		if (generateFunc)
 		{
 			QWidget* widget = generateFunc(networkWidget);

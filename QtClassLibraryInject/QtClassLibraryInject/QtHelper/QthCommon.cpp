@@ -45,4 +45,19 @@ namespace Qth
 		return nullptr;
 #endif
 	}
+
+	QString getCurrentModulePath()
+	{
+		QString currentPath;
+#ifdef Q_OS_WIN
+		MEMORY_BASIC_INFORMATION mbi;
+		HMODULE hModule = ((::VirtualQuery(getCurrentModulePath, &mbi, sizeof(mbi)) != 0) ? (HMODULE)mbi.AllocationBase : NULL);
+		WCHAR path[MAX_PATH + 1] = { 0 };
+
+		::GetModuleFileName(hModule, path, MAX_PATH);
+		currentPath = QString::fromStdWString(std::wstring(path));
+#endif 
+
+		return currentPath;
+	}
 }
