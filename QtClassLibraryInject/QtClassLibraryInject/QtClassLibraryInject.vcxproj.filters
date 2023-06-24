@@ -97,6 +97,9 @@
     <ClInclude Include="QtHelper\QthCustomListItem.h">
       <Filter>QtHelper</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\QtHelperNetWorkExport.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="QtClassLibraryInject.def">

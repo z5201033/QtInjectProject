@@ -6,5 +6,4 @@ class QTCLASSLIBRARYINJECT_EXPORT QtClassLibraryInject
 {
 public:
     QtClassLibraryInject();
-    static void CtreateWidgetHelper();
 };

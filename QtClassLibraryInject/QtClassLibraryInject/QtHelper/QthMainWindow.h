@@ -18,6 +18,7 @@ namespace Qth
 	private:
 		QTabWidget* m_tabWidget = nullptr;
 		QWidget* addWidgetHelper();
-		QWidget* addObjecttHelper();
+		QWidget* addObjectHelper();
+		QWidget* addNetworkHelper();
 	};
 }
