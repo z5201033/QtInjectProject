@@ -20,5 +20,6 @@ namespace Qth
 		QWidget* addWidgetHelper();
 		QWidget* addObjectHelper();
 		QWidget* addNetworkHelper();
+		QWidget* addAboutWidget();
 	};
 }

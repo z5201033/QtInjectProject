@@ -29,6 +29,12 @@
     <Filter Include="QtHelper">
       <UniqueIdentifier>{d4c4d076-3850-417c-8318-25bba76e145a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="QtHelper\WidgetHelper">
+      <UniqueIdentifier>{60735828-2014-4db5-8a6e-fa8c051036fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="QtHelper\ObjectHelper">
+      <UniqueIdentifier>{186bdfa2-2d96-40b2-ae9e-7746e49e9b5b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="QtClassLibraryInject.cpp">
@@ -43,20 +49,29 @@
     <ClCompile Include="QtHelper\QthMainWindow.cpp">
       <Filter>QtHelper</Filter>
     </ClCompile>
-    <ClCompile Include="QtHelper\QthWidgetHelper.cpp">
-      <Filter>QtHelper</Filter>
-    </ClCompile>
     <ClCompile Include="QtHelper\QthCaptureDlg.cpp">
-      <Filter>QtHelper</Filter>
-    </ClCompile>
-    <ClCompile Include="QtHelper\QthWidgetDetails.cpp">
       <Filter>QtHelper</Filter>
     </ClCompile>
     <ClCompile Include="QtHelper\QthCommon.cpp">
       <Filter>QtHelper</Filter>
     </ClCompile>
-    <ClCompile Include="QtHelper\QthCustomListItem.cpp">
+    <ClCompile Include="QtHelper\WidgetHelper\QthCustomListItem.cpp">
+      <Filter>QtHelper\WidgetHelper</Filter>
+    </ClCompile>
+    <ClCompile Include="QtHelper\WidgetHelper\QthWidgetDetails.cpp">
+      <Filter>QtHelper\WidgetHelper</Filter>
+    </ClCompile>
+    <ClCompile Include="QtHelper\WidgetHelper\QthWidgetHelper.cpp">
+      <Filter>QtHelper\WidgetHelper</Filter>
+    </ClCompile>
+    <ClCompile Include="QtHelper\ObjectHelper\QthWatchObjectWidget.cpp">
+      <Filter>QtHelper\ObjectHelper</Filter>
+    </ClCompile>
+    <ClCompile Include="QtHelper\QthEnumUtils.cpp">
       <Filter>QtHelper</Filter>
+    </ClCompile>
+    <ClCompile Include="QtHelper\ObjectHelper\QthWatchObjectFilterDlg.cpp">
+      <Filter>QtHelper\ObjectHelper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -71,14 +86,20 @@
     <QtMoc Include="QtHelper\QthMainWindow.h">
       <Filter>QtHelper</Filter>
     </QtMoc>
-    <QtMoc Include="QtHelper\QthWidgetHelper.h">
-      <Filter>QtHelper</Filter>
-    </QtMoc>
     <QtMoc Include="QtHelper\QthCaptureDlg.h">
       <Filter>QtHelper</Filter>
     </QtMoc>
-    <QtMoc Include="QtHelper\QthWidgetDetails.h">
-      <Filter>QtHelper</Filter>
+    <QtMoc Include="QtHelper\WidgetHelper\QthWidgetDetails.h">
+      <Filter>QtHelper\WidgetHelper</Filter>
+    </QtMoc>
+    <QtMoc Include="QtHelper\WidgetHelper\QthWidgetHelper.h">
+      <Filter>QtHelper\WidgetHelper</Filter>
+    </QtMoc>
+    <QtMoc Include="QtHelper\ObjectHelper\QthWatchObjectWidget.h">
+      <Filter>QtHelper\ObjectHelper</Filter>
+    </QtMoc>
+    <QtMoc Include="QtHelper\ObjectHelper\QthWatchObjectFilterDlg.h">
+      <Filter>QtHelper\ObjectHelper</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
@@ -94,11 +115,14 @@
     <ClInclude Include="QtHelper\QthCommon.h">
       <Filter>QtHelper</Filter>
     </ClInclude>
-    <ClInclude Include="QtHelper\QthCustomListItem.h">
-      <Filter>QtHelper</Filter>
-    </ClInclude>
     <ClInclude Include="..\Include\QtHelperNetWorkExport.h">
       <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="QtHelper\WidgetHelper\QthCustomListItem.h">
+      <Filter>QtHelper\WidgetHelper</Filter>
+    </ClInclude>
+    <ClInclude Include="QtHelper\QthEnumUtils.h">
+      <Filter>QtHelper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

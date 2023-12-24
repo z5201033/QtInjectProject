@@ -90,7 +90,7 @@ LRESULT CALLBACK MainThreadKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 	TCHAR szPath[MAX_PATH] = { 0 };
 	TCHAR szNewFile[MAX_PATH] = { 0 };
 	if (((DWORD)lParam & 0x40000000) && (nCode == HC_ACTION)) {
-		if (wParam == 0x53 && (GetKeyState(VK_CONTROL) & 0x8000) && (GetKeyState(VK_SHIFT) & 0x8000)) // Ctrl + Shift + S
+		if (wParam == 'T' && (GetKeyState(VK_CONTROL) & 0x8000) && (GetKeyState(VK_SHIFT) & 0x8000)) // Ctrl + Shift + S
 		{
 			RaiseWidgetHelper();
 		}

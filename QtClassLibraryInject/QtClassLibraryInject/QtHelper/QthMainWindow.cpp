@@ -1,5 +1,5 @@
 ﻿#include "QthMainWindow.h"
-#include "QthWidgetHelper.h"
+#include "WidgetHelper/QthWidgetHelper.h"
 #include "QtHelperNetWorkExport.h"
 #include "QthCommon.h"
 
@@ -8,6 +8,7 @@
 #include <QLibrary>
 #include <QTabWidget>
 #include <QVBoxLayout>
+#include <QTextEdit>
 
 namespace Qth
 {
@@ -41,6 +42,7 @@ namespace Qth
 		m_tabWidget->addTab(addWidgetHelper(), "Widget");
 		m_tabWidget->addTab(addObjectHelper(), "Object");
 		m_tabWidget->addTab(addNetworkHelper(), "Network");
+		m_tabWidget->addTab(addAboutWidget(), "About");
 
 		mainLayout->addWidget(m_tabWidget);
 	}
@@ -74,7 +76,7 @@ namespace Qth
 		networklayout->setSpacing(0);
 
 		QString networkPath = "QtHelperNetWork";
-		QString currentPath = getCurrentModulePath();
+		QString currentPath = QthCommon::getCurrentModulePath();
 		if (!currentPath.isEmpty())
 		{
 			QFileInfo info(currentPath);
@@ -102,5 +104,20 @@ namespace Qth
 		}
 
 		return networkWidget;
+	}
+
+	QWidget* QthMainWindow::addAboutWidget()
+	{
+		QWidget* aboutWidget = new QWidget(this);
+		QVBoxLayout* aboutLayout = new QVBoxLayout(aboutWidget);
+		aboutLayout->setContentsMargins(0, 0, 0, 0);
+		aboutLayout->setSpacing(0);
+
+		QTextEdit* textEdit = new QTextEdit(aboutWidget);
+		textEdit->setText("Shortcut Keys:\n");
+		textEdit->append("Alt + Ctrl + T: Display and Top the QtHelper Widget.It can be placed on top of the modal window.");
+		aboutLayout->addWidget(textEdit);
+
+		return aboutWidget;
 	}
 }

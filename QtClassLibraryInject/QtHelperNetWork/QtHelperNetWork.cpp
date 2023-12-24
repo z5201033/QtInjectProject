@@ -12,7 +12,8 @@ QtHelperNetWork::QtHelperNetWork(QWidget* parent)
 	mainlayout->setSpacing(0);
 
 	QLabel* testLabel = new QLabel(this);
-	testLabel->setText("QtHelperNetWork");
+	testLabel->setAlignment(Qt::AlignCenter);
+	testLabel->setText("The network module is currently not supported!");
 
 		// 合法格式：127.0.0.1:8888
 // 	QNetworkProxy proxy;

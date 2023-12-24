@@ -17,14 +17,14 @@ namespace Qth
 	}
 #endif
 
-	QSize getContentWidth(QFont font, QString str)
+	QSize QthCommon::getContentWidth(QFont font, QString str)
 	{
 		QFontMetrics fontMetrics(font);
 		QRect rect = fontMetrics.boundingRect(str);
 		return rect.size();
 	}
 
-	QWidget* convertAddrToWidget(quint64 addr)
+	QWidget* QthCommon::convertAddrToWidget(quint64 addr)
 	{
 #ifdef Q_OS_WIN
 		__try
@@ -46,7 +46,7 @@ namespace Qth
 #endif
 	}
 
-	QString getCurrentModulePath()
+	QString QthCommon::getCurrentModulePath()
 	{
 		QString currentPath;
 #ifdef Q_OS_WIN

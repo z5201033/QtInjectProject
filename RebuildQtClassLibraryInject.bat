@@ -2,7 +2,7 @@
 @set OldPath=%cd%
 ::x86_amd64的路径要自己找
  
-@cd /d F:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64
+@cd /d C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build
 @if not %errorlevel% == 0 goto :end
 call vcvarsx86_amd64.bat
 @if not %errorlevel% == 0 goto :end

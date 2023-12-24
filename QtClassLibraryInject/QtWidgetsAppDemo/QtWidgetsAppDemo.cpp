@@ -8,7 +8,7 @@ QtWidgetsAppDemo::QtWidgetsAppDemo(QWidget *parent)
 {
     ui.setupUi(this);
     ui.pushButton->setFixedWidth(80);
-    connect(ui.pushButton, &QPushButton::clicked, this, [=]() {
+    connect(ui.pushButton, &QPushButton::clicked, this, [=](bool checked) {
         ::LoadLibraryW(L"QtClassLibraryInject.dll");
      });
 }

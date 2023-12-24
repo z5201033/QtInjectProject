@@ -180,12 +180,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="QtHelper\ObjectHelper\QthWatchObjectFilterDlg.cpp" />
+    <ClCompile Include="QtHelper\ObjectHelper\QthWatchObjectWidget.cpp" />
     <ClCompile Include="QtHelper\QthCaptureDlg.cpp" />
     <ClCompile Include="QtHelper\QthCommon.cpp" />
-    <ClCompile Include="QtHelper\QthCustomListItem.cpp" />
+    <ClCompile Include="QtHelper\QthEnumUtils.cpp" />
     <ClCompile Include="QtHelper\QthMainWindow.cpp" />
-    <ClCompile Include="QtHelper\QthWidgetDetails.cpp" />
-    <ClCompile Include="QtHelper\QthWidgetHelper.cpp" />
+    <ClCompile Include="QtHelper\WidgetHelper\QthCustomListItem.cpp" />
+    <ClCompile Include="QtHelper\WidgetHelper\QthWidgetDetails.cpp" />
+    <ClCompile Include="QtHelper\WidgetHelper\QthWidgetHelper.cpp" />
     <ClCompile Include="Utils\SystemCommonUtils.cpp" />
     <ClCompile Include="WidgetHelper\widgethelper.cpp" />
     <ClCompile Include="QtClassLibraryInject.cpp" />
@@ -195,12 +198,15 @@
     <ClInclude Include="..\Include\QtClassLibraryInject.h" />
     <ClInclude Include="..\Include\qtclasslibraryinject_global.h" />
     <QtMoc Include="QtHelper\QthMainWindow.h" />
-    <QtMoc Include="QtHelper\QthWidgetHelper.h" />
     <QtMoc Include="QtHelper\QthCaptureDlg.h" />
-    <QtMoc Include="QtHelper\QthWidgetDetails.h" />
     <ClInclude Include="..\Include\QtHelperNetWorkExport.h" />
+    <QtMoc Include="QtHelper\ObjectHelper\QthWatchObjectWidget.h" />
+    <QtMoc Include="QtHelper\ObjectHelper\QthWatchObjectFilterDlg.h" />
     <ClInclude Include="QtHelper\QthCommon.h" />
-    <ClInclude Include="QtHelper\QthCustomListItem.h" />
+    <ClInclude Include="QtHelper\QthEnumUtils.h" />
+    <ClInclude Include="QtHelper\WidgetHelper\QthCustomListItem.h" />
+    <QtMoc Include="QtHelper\WidgetHelper\QthWidgetDetails.h" />
+    <QtMoc Include="QtHelper\WidgetHelper\QthWidgetHelper.h" />
     <ClInclude Include="Utils\SystemCommonUtils.h" />
   </ItemGroup>
   <ItemGroup>

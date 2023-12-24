@@ -7,7 +7,11 @@
 
 namespace Qth
 {
-	QSize getContentWidth(QFont font, QString str);
-	QWidget* convertAddrToWidget(quint64 addr);
-	QString getCurrentModulePath();
+	class QthCommon
+	{
+	public:
+		static QSize getContentWidth(QFont font, QString str);
+		static QWidget* convertAddrToWidget(quint64 addr);
+		static QString getCurrentModulePath();
+	};
 }
