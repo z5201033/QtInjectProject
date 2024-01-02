@@ -1,7 +1,8 @@
 ﻿#include "QthMainWindow.h"
-#include "WidgetHelper/QthWidgetHelper.h"
+#include "ObjectHelper/ObjectHelper.h"
 #include "QtHelperNetWorkExport.h"
-#include "QthCommon.h"
+#include "Common.h"
+#include "WidgetHelper/WidgetHelper.h"
 
 #include <QDir>
 #include <QLabel>
@@ -55,17 +56,7 @@ namespace Qth
 
 	QWidget* QthMainWindow::addObjectHelper()
 	{
-		QWidget* objectWidget = new QWidget(this);
-		QVBoxLayout* objectlayout = new QVBoxLayout(objectWidget);
-		objectlayout->setContentsMargins(0, 0, 0, 0);
-		objectlayout->setSpacing(0);
-
-		QLabel* labelTip = new QLabel();
-		labelTip->setAlignment(Qt::AlignCenter);
-		labelTip->setText("The module is currently not supported!");
-		objectlayout->addWidget(labelTip);
-
-		return objectWidget;
+		return new ObjectHelper();
 	}
 
 	QWidget* QthMainWindow::addNetworkHelper()
@@ -76,7 +67,7 @@ namespace Qth
 		networklayout->setSpacing(0);
 
 		QString networkPath = "QtHelperNetWork";
-		QString currentPath = QthCommon::getCurrentModulePath();
+		QString currentPath = Common::getCurrentModulePath();
 		if (!currentPath.isEmpty())
 		{
 			QFileInfo info(currentPath);
@@ -114,9 +105,9 @@ namespace Qth
 		aboutLayout->setSpacing(0);
 
 		QTextEdit* textEdit = new QTextEdit(aboutWidget);
-		textEdit->setText("Shortcut Keys:\n");
-		textEdit->append("Alt + Ctrl + T: Display and Top the QtHelper Widget.It can be placed on top of the modal window.");
 		aboutLayout->addWidget(textEdit);
+		textEdit->setText("Shortcut Keys:");
+		textEdit->append("Alt + Ctrl + T: Display and Top the QtHelper Widget.It can be placed on top of the modal window.");
 
 		return aboutWidget;
 	}

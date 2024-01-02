@@ -1,5 +1,5 @@
 #include "QtClassLibraryInject.h"
-#include "WidgetHelper/widgethelper.h"
+#include "WidgetHelperSimple/WidgetHelperSimple.h"
 
 QtClassLibraryInject::QtClassLibraryInject()
 {

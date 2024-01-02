@@ -5,7 +5,7 @@
 #include <QApplication>
 
 #include "QtHelper/QthMainWindow.h"
-#include "WidgetHelper/widgethelper.h"
+#include "WidgetHelperSimple/WidgetHelperSimple.h"
 #include "Utils/SystemCommonUtils.h"
 
 static DWORD g_dwMainTId = -1;
