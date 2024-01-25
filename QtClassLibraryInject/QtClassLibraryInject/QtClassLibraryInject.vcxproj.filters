@@ -52,9 +52,6 @@
     <ClCompile Include="QtHelper\ObjectHelper\ObjectCollector.cpp">
       <Filter>QtHelper\ObjectHelper</Filter>
     </ClCompile>
-    <ClCompile Include="QtHelper\WidgetHelper\WatchGlobalFocusDlg.cpp">
-      <Filter>QtHelper\WidgetHelper</Filter>
-    </ClCompile>
     <ClCompile Include="QtHelper\ObjectHelper\ObjectHelper.cpp">
       <Filter>QtHelper\ObjectHelper</Filter>
     </ClCompile>
@@ -85,6 +82,9 @@
     <ClCompile Include="Utils\QtEnumUtils.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="QtHelper\ObjectHelper\WatchGlobalFocusDlg.cpp">
+      <Filter>QtHelper\ObjectHelper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="QtHelper\QthMainWindow.h">
@@ -92,9 +92,6 @@
     </QtMoc>
     <QtMoc Include="QtHelper\ObjectHelper\ObjectCollector.h">
       <Filter>QtHelper\ObjectHelper</Filter>
-    </QtMoc>
-    <QtMoc Include="QtHelper\WidgetHelper\WatchGlobalFocusDlg.h">
-      <Filter>QtHelper\WidgetHelper</Filter>
     </QtMoc>
     <QtMoc Include="QtHelper\ObjectHelper\ObjectHelper.h">
       <Filter>QtHelper\ObjectHelper</Filter>
@@ -116,6 +113,9 @@
     </QtMoc>
     <QtMoc Include="QtHelper\CaptureDlg.h">
       <Filter>QtHelper</Filter>
+    </QtMoc>
+    <QtMoc Include="QtHelper\ObjectHelper\WatchGlobalFocusDlg.h">
+      <Filter>QtHelper\ObjectHelper</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

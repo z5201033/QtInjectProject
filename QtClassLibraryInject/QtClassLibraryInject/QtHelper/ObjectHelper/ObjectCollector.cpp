@@ -1,9 +1,11 @@
 ﻿#include "ObjectCollector.h"
 
 #include <QApplication>
+#include <QGuiApplication>
 #include <QHash>
 #include <QPointer>
 #include <QWidget>
+#include <QWindow>
 
 namespace Qth
 {
@@ -47,7 +49,7 @@ namespace Qth
 		if (d->_first)
 		{
 			d->_first = false;
-			addTopWidgetToCache();
+			addTopObjectToCache();
 		}
 
 		QSet<QObject*> objects;
@@ -69,12 +71,14 @@ namespace Qth
 		return objects;
 	}
 
-	void ObjectCollector::addTopWidgetToCache()
+	void ObjectCollector::addTopObjectToCache()
 	{
-		if (!qApp)
-			return;
-		QWidgetList widgets = qApp->topLevelWidgets();
-		for (QWidget* w : widgets)
+		for (QWidget* w : QApplication::topLevelWidgets())
+		{
+			d->_objectsCache[w] = w;
+		}
+
+		for (QWindow* w : QGuiApplication::topLevelWindows())
 		{
 			d->_objectsCache[w] = w;
 		}

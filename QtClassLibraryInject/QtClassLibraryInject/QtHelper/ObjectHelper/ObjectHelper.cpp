@@ -3,9 +3,11 @@
 #include "../CaptureDlg.h"
 #include "../Common.h"
 #include "../ObjectHelper/WatchObjectWidget.h"
+#include "WatchGlobalFocusDlg.h"
 
 #include <QApplication>
 #include <QClipboard>
+#include <QDebug>
 #include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
@@ -16,12 +18,14 @@
 #include <QTimer>
 #include <QTreeWidget>
 #include <QVBoxLayout>
+#include <QWindow>
 
 namespace Qth
 {
 	const QString Name_Addr			= "addrObject";
-	const QString Name_Class			= "classObject";
+	const QString Name_Class		= "classObject";
 	const QString Name_ObjectName	= "objectNameObject";
+	const QString Name_ObjectDetail = "objectDetail";
 
 	//////////////////////////////////////////////////////////////////////////
 	// WidgetHelper
@@ -29,6 +33,7 @@ namespace Qth
 		: QWidget(parent)
 	{
 		m_captureDlgMgr = new CaptureDlgMgr();
+		m_captureDlgMgr->seCaptureMode(CaptureDlgMgr::All);
 		connect(m_captureDlgMgr, &CaptureDlgMgr::sigCatchWidgetChanged, this, &ObjectHelper::onCatchWidgetChanged);
 		connect(m_captureDlgMgr, &CaptureDlgMgr::sigCatchWidgetFinish, this, &ObjectHelper::onCatchWidgetFinish);
 
@@ -79,6 +84,12 @@ namespace Qth
 		QPushButton* refreshBtn = new QPushButton("RefreshTree", this);
 		refreshBtn->setFixedWidth(Common::getContentWidth(refreshBtn->font(), "RefreshTree").width() + 20);
 
+		QPushButton* watchQObjectFocusBtn = new QPushButton("QObjectFocus", this);
+		watchQObjectFocusBtn->setFixedWidth(Common::getContentWidth(watchQObjectFocusBtn->font(), "QObjectFocus").width() + 20);
+
+		QPushButton* watchQWindowFocusBtn = new QPushButton("QWindowFocus", this);
+		watchQWindowFocusBtn->setFixedWidth(Common::getContentWidth(watchQWindowFocusBtn->font(), "QWindowFocus").width() + 20);
+
 		m_searchEdit = new QLineEdit(this);
 		m_searchEdit->setObjectName(Name_Class);
 		m_searchEdit->setFixedWidth(200);
@@ -100,6 +111,10 @@ namespace Qth
 		hLayout->addSpacing(10);
 		hLayout->addWidget(refreshBtn);
 		hLayout->addSpacing(10);
+		hLayout->addWidget(watchQObjectFocusBtn);
+		hLayout->addSpacing(10);
+		hLayout->addWidget(watchQWindowFocusBtn);
+		hLayout->addSpacing(10);
 		hLayout->addWidget(m_searchEdit);
 		hLayout->addSpacing(10);
 		hLayout->addStretch();
@@ -109,6 +124,8 @@ namespace Qth
 		connect(findObjectBtn, &QPushButton::pressed, this, &ObjectHelper::onFindWidgetBtnPressed);
 		connect(refreshBtn, &QPushButton::pressed, this, &ObjectHelper::onRefreshBtnPressed);
 		connect(tipBtn, &QPushButton::pressed, this, &ObjectHelper::onTipBtnPressed);
+		connect(watchQObjectFocusBtn, &QPushButton::pressed, this, &ObjectHelper::onWatchQObjectFocusBtnPressed);
+		connect(watchQWindowFocusBtn, &QPushButton::pressed, this, &ObjectHelper::onWatchQWindowFocusBtnPressed);
 		connect(m_searchEdit, &QLineEdit::textChanged, this, &ObjectHelper::onSearchTextChanged);
 
 		return widget;
@@ -170,6 +187,30 @@ namespace Qth
 		QMessageBox::information(this, "Object", "The QObject objects collected are not complete!\nGammRay also has the same problem.");
 	}
 
+	void ObjectHelper::onWatchQObjectFocusBtnPressed()
+	{
+		if (!m_watchQObjectFocusDlg)
+		{
+			m_watchQObjectFocusDlg = new WatchGlobalFocusDlg(this, WatchGlobalFocusDlg::WatchType::QObjectFocus);
+			m_watchQObjectFocusDlg->setAttribute(Qt::WA_DeleteOnClose);
+		}
+
+		m_watchQObjectFocusDlg->showNormal();
+		m_watchQObjectFocusDlg->raise();
+	}
+
+	void ObjectHelper::onWatchQWindowFocusBtnPressed()
+	{
+		if (!m_watchQWindowFocusDlg)
+		{
+			m_watchQWindowFocusDlg = new WatchGlobalFocusDlg(this, WatchGlobalFocusDlg::WatchType::QWindowFocus);
+			m_watchQWindowFocusDlg->setAttribute(Qt::WA_DeleteOnClose);
+		}
+
+		m_watchQWindowFocusDlg->showNormal();
+		m_watchQWindowFocusDlg->raise();
+	}
+
 	void ObjectHelper::onSearchTextChanged(const QString&)
 	{
 		if (m_searching)
@@ -194,7 +235,7 @@ namespace Qth
 		return m_treeInfoObjectHelper;
 	}
 
-	void ObjectHelper::onHighLightWidget(QWidget* widget)
+	void ObjectHelper::onHighLightWidget(QObject* widget)
 	{
 		if (!widget)
 			return;
@@ -203,19 +244,19 @@ namespace Qth
 			m_captureDlgMgr->highLightWidget(widget);
 	}
 
-	void ObjectHelper::onCatchWidgetChanged(QWidget* targetWidget)
+	void ObjectHelper::onCatchWidgetChanged(QObject* target)
 	{
-		updateCatchObjectInfo(targetWidget);
+		updateCatchObjectInfo(target);
 	}
 
-	void ObjectHelper::onCatchWidgetFinish(QWidget* targetWidget)
+	void ObjectHelper::onCatchWidgetFinish(QObject* target)
 	{
 		setCursor(Qt::ArrowCursor);
-		updateCatchObjectInfo(targetWidget);
+		updateCatchObjectInfo(target);
 
-		if (m_treeInfoObjectHelper && targetWidget)
+		if (m_treeInfoObjectHelper && target)
 		{
-			if (!m_treeInfoObjectHelper->findAndScrollToTargetInTree(targetWidget))
+			if (!m_treeInfoObjectHelper->findAndScrollToTargetInTree(target))
 				QMessageBox::warning(this, "warning", "Can't find target object in object tree! Try refresh object tree.");
 		}
 	}
@@ -291,6 +332,7 @@ namespace Qth
 		headerString.append(StringPair(Name_Class, "ClassName"));
 		headerString.append(StringPair(Name_Addr, "Address"));
 		headerString.append(StringPair(Name_ObjectName, "ObjectName"));
+		headerString.append(StringPair(Name_ObjectDetail, "ObjectDetail"));
 
 		for (int i = 0; i < headerString.size(); i++)
 		{
@@ -313,9 +355,7 @@ namespace Qth
 			QObject* obj = getItemObject(item);
 			if (!obj)
 				return;
-			QWidget* curWidget = tryToWidget(obj);
-			if (curWidget)
-				emit sigHighLightWidget(curWidget);
+			emit sigHighLightWidget(obj);
 		};
 
 		connect(m_treeInfo, &QTreeWidget::itemClicked, this, [=](QTreeWidgetItem* item, int column) {
@@ -476,6 +516,17 @@ namespace Qth
 		item->setText(m_headerToIndex[Name_Addr], QString("0x%0").arg(QString::number((quint64)node, 16)));
 		item->setText(m_headerToIndex[Name_Class], QString::fromStdString(node->metaObject()->className()));
 		item->setText(m_headerToIndex[Name_ObjectName], QString("%0").arg(node->objectName()));
+
+		QString output;
+		QDebug debug(&output);
+		debug.setVerbosity(QDebug::MaximumVerbosity);
+		if (QWidget* widget = qobject_cast<QWidget*>(node))
+			debug << widget;
+		else if (QWindow* window = qobject_cast<QWindow*>(node))
+			debug << window;
+		else
+			debug << node;
+		item->setText(m_headerToIndex[Name_ObjectDetail], output);
 	}
 
 	void TreeInfoObjectHelper::showObjectInfoDetailed(QObject* widget)
@@ -500,7 +551,7 @@ namespace Qth
 		widget->setFilterObject(obj);
 		widget->showNormal();
 		connect(widget, &WatchObjectWidget::sigHighlight, this, [=](QObject* obj) {
-			emit sigHighLightWidget(qobject_cast<QWidget*>(obj));
+			emit sigHighLightWidget(obj);
 		});
 	}
 

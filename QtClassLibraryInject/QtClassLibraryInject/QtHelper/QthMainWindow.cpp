@@ -107,7 +107,7 @@ namespace Qth
 		QTextEdit* textEdit = new QTextEdit(aboutWidget);
 		aboutLayout->addWidget(textEdit);
 		textEdit->setText("Shortcut Keys:");
-		textEdit->append("Alt + Ctrl + T: Display and Top the QtHelper Widget.It can be placed on top of the modal window.");
+		textEdit->append("Ctrl + Shift + T: Display and Top the QtHelper Widget.It can be placed on top of the modal window.");
 
 		return aboutWidget;
 	}

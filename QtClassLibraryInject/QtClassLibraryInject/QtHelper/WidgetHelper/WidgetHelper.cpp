@@ -2,8 +2,8 @@
 #include "../CaptureDlg.h"
 #include "../Common.h"
 #include "../ObjectHelper/WatchObjectWidget.h"
+#include "../ObjectHelper/WatchGlobalFocusDlg.h"
 #include "WidgetDetails.h"
-#include "WatchGlobalFocusDlg.h"
 
 #include <QApplication>
 #include <QClipboard>
@@ -180,11 +180,12 @@ namespace Qth
 	{
 		if (!m_watchGlobalFocusDlg)
 		{
-			m_watchGlobalFocusDlg = new WatchGlobalFocusDlg(this);
+			m_watchGlobalFocusDlg = new WatchGlobalFocusDlg(this, WatchGlobalFocusDlg::WatchType::QWidgetFocus);
 			m_watchGlobalFocusDlg->setAttribute(Qt::WA_DeleteOnClose);
 		}
 
 		m_watchGlobalFocusDlg->showNormal();
+		m_watchGlobalFocusDlg->raise();
 	}
 
 	void WidgetHelper::onSearchTextChanged(const QString&)
@@ -220,17 +221,18 @@ namespace Qth
 			m_captureDlgMgr->highLightWidget(widget);
 	}
 
-	void WidgetHelper::onCatchWidgetChanged(QWidget* targetWidget)
+	void WidgetHelper::onCatchWidgetChanged(QObject* target)
 	{
-		updateCatchWidgetInfo(targetWidget);
+		updateCatchWidgetInfo(qobject_cast<QWidget*>(target));
 	}
 
-	void WidgetHelper::onCatchWidgetFinish(QWidget* targetWidget)
+	void WidgetHelper::onCatchWidgetFinish(QObject* target)
 	{
 		setCursor(Qt::ArrowCursor);
+		QWidget* targetWidget = qobject_cast<QWidget*>(target);
 		updateCatchWidgetInfo(targetWidget);
 
-		if (m_treeInfoWidgetHelper && targetWidget)
+		if (m_treeInfoWidgetHelper && target)
 		{
 			if (!m_treeInfoWidgetHelper->findAndScrollToTargetInTree(targetWidget))
 				QMessageBox::warning(this, "warning", "Can't find target widget in widget tree! Try refresh widget tree.");
@@ -399,9 +401,9 @@ namespace Qth
 
 	void TreeInfoWidgetHelper::clearAllInfo()
 	{
-		m_treeInfo->clear();
 		m_treeItemToWidget.clear();
 		m_widgetToTreeItem.clear();
+		m_treeInfo->clear();
 	}
 
 	void TreeInfoWidgetHelper::setWidgetRootNode(QWidgetList rootList)

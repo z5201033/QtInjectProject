@@ -184,11 +184,11 @@
     <ClCompile Include="QtHelper\Common.cpp" />
     <ClCompile Include="QtHelper\ObjectHelper\ObjectCollector.cpp" />
     <ClCompile Include="QtHelper\ObjectHelper\ObjectHelper.cpp" />
+    <ClCompile Include="QtHelper\ObjectHelper\WatchGlobalFocusDlg.cpp" />
     <ClCompile Include="QtHelper\ObjectHelper\WatchObjectFilterDlg.cpp" />
     <ClCompile Include="QtHelper\ObjectHelper\WatchObjectWidget.cpp" />
     <ClCompile Include="QtHelper\QthMainWindow.cpp" />
     <ClCompile Include="QtHelper\WidgetHelper\CustomListItem.cpp" />
-    <ClCompile Include="QtHelper\WidgetHelper\WatchGlobalFocusDlg.cpp" />
     <ClCompile Include="QtHelper\WidgetHelper\WidgetDetails.cpp" />
     <ClCompile Include="QtHelper\WidgetHelper\WidgetHelper.cpp" />
     <ClCompile Include="Utils\QtEnumUtils.cpp" />
@@ -206,9 +206,9 @@
     <QtMoc Include="QtHelper\ObjectHelper\ObjectHelper.h" />
     <QtMoc Include="QtHelper\ObjectHelper\WatchObjectFilterDlg.h" />
     <QtMoc Include="QtHelper\ObjectHelper\WatchObjectWidget.h" />
-    <QtMoc Include="QtHelper\WidgetHelper\WatchGlobalFocusDlg.h" />
     <QtMoc Include="QtHelper\CaptureDlg.h" />
     <ClInclude Include="QtHelper\Common.h" />
+    <QtMoc Include="QtHelper\ObjectHelper\WatchGlobalFocusDlg.h" />
     <ClInclude Include="QtHelper\WidgetHelper\CustomListItem.h" />
     <QtMoc Include="QtHelper\WidgetHelper\WidgetDetails.h" />
     <QtMoc Include="QtHelper\WidgetHelper\WidgetHelper.h" />

@@ -19,19 +19,30 @@ namespace Qth
 	{
 		Q_OBJECT
 	public:
+		enum CaptureMode
+		{
+			Widget,
+			Window,
+			All
+		};
+	public:
 		CaptureDlgMgr(QObject* parent = nullptr);
 		~CaptureDlgMgr();
 
 		void startAutoPickerWidget();
-		void highLightWidget(QWidget* highLightWidget = nullptr);
+		void highLightWidget(QObject* highLightWidget = nullptr);
+		void seCaptureMode(CaptureMode mode);
 
 	signals:
-		void sigCatchWidgetChanged(QWidget* targetWidget);
-		void sigCatchWidgetFinish(QWidget* targetWidget);
+		void sigCatchWidgetChanged(QObject* target);
+		void sigCatchWidgetFinish(QObject* target);
 
 	private:
 		void updateCaptureDlgPos();
 		void hideCaptureDlg();
+		void initWindowCache();
+		QWindow* getCaptureWindow();
+		QWindow* getDstWindow(QWindow* parent, const QPoint& globalPos);
 	private:
 #ifdef Q_OS_WIN
 		CaptureDlgNative*		m_CaptureDlgNative;
@@ -42,7 +53,9 @@ namespace Qth
 		QTimer*					m_checkWidgetTimer = nullptr;
 		QTimer*					m_highLightTimer = nullptr;
 		int						m_highLightCount = 0;
-		QPointer<QWidget>		m_targetWidget = nullptr;
+		QPointer<QObject>		m_target = nullptr;
+		CaptureMode				m_captureMode = CaptureMode::Widget;
+		QHash<WId, QVector<QPointer<QWindow>>> m_windowZOrderCache;
 	};
 
 	//////////////////////////////////////////////////////////////////////////

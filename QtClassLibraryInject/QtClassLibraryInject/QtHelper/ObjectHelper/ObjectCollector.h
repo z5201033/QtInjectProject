@@ -19,7 +19,7 @@ namespace Qth
 		bool eventFilter(QObject* watched, QEvent* event) override;
 
 	private:
-		void addTopWidgetToCache();
+		void addTopObjectToCache();
 
 	private:
 		struct ObjectCollectorPrivate* d;

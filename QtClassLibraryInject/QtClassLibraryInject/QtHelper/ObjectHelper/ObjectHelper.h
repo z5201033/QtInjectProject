@@ -14,6 +14,7 @@ namespace Qth
 	class CaptureDlgMgr;
 	class ObjectCollector;
 	class TreeInfoObjectHelper;
+	class WatchGlobalFocusDlg;
 
 	//////////////////////////////////////////////////////////////////////////
 	// WidgetHelper
@@ -32,10 +33,12 @@ namespace Qth
 		void onFindWidgetBtnPressed();
 		void onRefreshBtnPressed();
 		void onTipBtnPressed();
+		void onWatchQObjectFocusBtnPressed();
+		void onWatchQWindowFocusBtnPressed();
 		void onSearchTextChanged(const QString&);
-		void onHighLightWidget(QWidget* widget);
-		void onCatchWidgetChanged(QWidget* targetWidget);
-		void onCatchWidgetFinish(QWidget* targetWidget);
+		void onHighLightWidget(QObject* widget);
+		void onCatchWidgetChanged(QObject* target);
+		void onCatchWidgetFinish(QObject* target);
 
 	private:
 		void initUI();
@@ -49,6 +52,8 @@ namespace Qth
 		TreeInfoObjectHelper*	m_treeInfoObjectHelper = nullptr;
 		QLineEdit*				m_searchEdit = nullptr;
 		bool						m_searching = false;
+		QPointer<WatchGlobalFocusDlg>	m_watchQObjectFocusDlg = nullptr;
+		QPointer<WatchGlobalFocusDlg>	m_watchQWindowFocusDlg = nullptr;
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -66,7 +71,7 @@ namespace Qth
 		void setSearchPattern(const QString& search);
 
 	signals:
-		void sigHighLightWidget(QWidget* widget);
+		void sigHighLightWidget(QObject* widget);
 
 	protected:
 		void showEvent(QShowEvent* event) override;

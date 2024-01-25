@@ -35,8 +35,8 @@ namespace Qth
 		void onWatchFocusBtnPressed();
 		void onSearchTextChanged(const QString&);
 		void onHighLightWidget(QWidget* widget);
-		void onCatchWidgetChanged(QWidget* targetWidget);
-		void onCatchWidgetFinish(QWidget* targetWidget);
+		void onCatchWidgetChanged(QObject* targetWidget);
+		void onCatchWidgetFinish(QObject* targetWidget);
 
 	private:
 		void initUI();

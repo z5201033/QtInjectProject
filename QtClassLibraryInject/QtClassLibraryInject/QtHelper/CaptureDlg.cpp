@@ -41,42 +41,134 @@ namespace Qth
 				{
 					m_checkWidgetTimer->stop();
 					hideCaptureDlg();
-					emit sigCatchWidgetFinish(m_targetWidget);
+					emit sigCatchWidgetFinish(m_target);
 					return;
 				}
 
-				QWidget* curWidget = QApplication::widgetAt(QCursor::pos());
-				if (m_targetWidget != curWidget)
+				QObject* cur = nullptr;
+				if (m_captureMode == CaptureMode::Window) {
+					cur = getCaptureWindow();
+				}
+				else {
+					QWidget* curWidget = QApplication::widgetAt(QCursor::pos());
+					cur = curWidget;
+					if (m_captureMode == CaptureMode::All) {
+						QWindow* window = getCaptureWindow();
+						if (window && (window->winId() != curWidget->window()->winId()))
+							cur = window;
+					}
+				}
+
+				if (m_target != cur)
 				{
-					m_targetWidget = curWidget;
-					emit sigCatchWidgetChanged(m_targetWidget);
+					m_target = cur;
+					emit sigCatchWidgetChanged(m_target);
 					updateCaptureDlgPos();
 					return;
 				}
 
-				if (m_targetWidget)
+				if (m_target)
 					updateCaptureDlgPos();
 				else
 					hideCaptureDlg();
 			});
 		}
 
-		m_targetWidget = nullptr;
+		m_target = nullptr;
 		m_checkWidgetTimer->stop();
 		m_checkWidgetTimer->start();
+		if (m_captureMode != CaptureMode::Widget)
+			initWindowCache();
+	}
+
+	void CaptureDlgMgr::initWindowCache()
+	{
+		m_windowZOrderCache.clear();
+	}
+
+	QWindow* CaptureDlgMgr::getCaptureWindow()
+	{
+		QPoint pos = QCursor::pos();
+		QWindow* parent = QGuiApplication::topLevelAt(pos);
+		if (!parent)
+			return parent;
+
+		return getDstWindow(parent, pos);
+	}
+
+	QWindow* CaptureDlgMgr::getDstWindow(QWindow* parent, const QPoint& globalPos)
+	{
+		if (!parent)
+			return parent;
+
+#ifdef Q_OS_WIN
+		auto find = m_windowZOrderCache.find(parent->winId());
+		if (find == m_windowZOrderCache.end()) {
+			QHash<WId, QWindow*> idToWindow;
+			WId wId = 0;
+			for (QObject* obj : parent->children()) {
+				QWindow* w = qobject_cast<QWindow*>(obj);
+				if (!w)
+					continue;
+
+				wId = w->winId();
+				idToWindow[wId] = w;
+			}
+
+			QVector<QPointer<QWindow>> zOrderWindows;
+			if (wId != 0) {
+				HWND hwndTmp = GetWindow((HWND)wId, GW_HWNDFIRST);;
+				while (hwndTmp) {
+					auto find = idToWindow.find((WId)hwndTmp);
+					if (find != idToWindow.end()) {
+						zOrderWindows.push_back(find.value());
+					}
+					hwndTmp = GetWindow(hwndTmp, GW_HWNDNEXT);
+				}
+			}
+			find = m_windowZOrderCache.insert(parent->winId(), zOrderWindows);
+		}
+
+		const QVector<QPointer<QWindow>>& windows = find.value();
+		for (int i = 0; i < windows.size(); i++)
+		{
+			QWindow* w = windows[i];
+			if (!w)
+				continue;
+
+			QRect rect = w->frameGeometry();
+			rect.moveTo(w->mapToGlobal(QPoint(w->width() - rect.width(), w->height() - rect.height())));
+			if (rect.contains(globalPos))
+				return getDstWindow(w, globalPos);
+		}
+#endif
+
+		return parent;
 	}
 
 	void CaptureDlgMgr::updateCaptureDlgPos()
 	{
-		if (!m_targetWidget)
+		QWidget* targetWidget = qobject_cast<QWidget*>(m_target);
+		if (targetWidget) {
+			QRect rect = targetWidget->frameGeometry();
+			rect.moveTo(targetWidget->mapToGlobal(QPoint(targetWidget->width() - rect.width(), targetWidget->height() - rect.height())));
+			if (m_captureDlg)
+			{
+				m_captureDlg->setGeometry(rect);
+				m_captureDlg->showNormal();
+			}
 			return;
-
-		QRect rect = m_targetWidget->frameGeometry();
-		rect.moveTo(m_targetWidget->mapToGlobal(QPoint(m_targetWidget->width() - rect.width(), m_targetWidget->height() - rect.height())));
-		if (m_captureDlg)
-		{
-			m_captureDlg->setGeometry(rect);
-			m_captureDlg->showNormal();
+		}
+		
+		QWindow* targetWindow = qobject_cast<QWindow*>(m_target);
+		if (targetWindow) {
+			QRect rect = targetWindow->frameGeometry();
+			rect.moveTo(targetWindow->mapToGlobal(QPoint(targetWindow->width() - rect.width(), targetWindow->height() - rect.height())));
+			if (m_captureDlg)
+			{
+				m_captureDlg->setGeometry(rect);
+				m_captureDlg->showNormal();
+			}
 		}
 	}
 
@@ -86,7 +178,7 @@ namespace Qth
 			m_captureDlg->hide();
 	}
 
-	void CaptureDlgMgr::highLightWidget(QWidget* highLightWidget/* = nullptr*/)
+	void CaptureDlgMgr::highLightWidget(QObject* highLightWidget/* = nullptr*/)
 	{
 		if (!m_highLightTimer)
 		{
@@ -108,9 +200,14 @@ namespace Qth
 		}
 
 		if (highLightWidget)
-			m_targetWidget = highLightWidget;
+			m_target = highLightWidget;
 		m_highLightCount = 0;
 		m_highLightTimer->start();
+	}
+
+	void CaptureDlgMgr::seCaptureMode(CaptureMode mode)
+	{
+		m_captureMode = mode;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
