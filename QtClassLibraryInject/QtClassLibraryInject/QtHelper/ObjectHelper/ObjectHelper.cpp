@@ -33,7 +33,7 @@ namespace Qth
 		: QWidget(parent)
 	{
 		m_captureDlgMgr = new CaptureDlgMgr();
-		m_captureDlgMgr->seCaptureMode(CaptureDlgMgr::All);
+		m_captureDlgMgr->seCaptureMode(CaptureDlgMgr::Window);
 		connect(m_captureDlgMgr, &CaptureDlgMgr::sigCatchWidgetChanged, this, &ObjectHelper::onCatchWidgetChanged);
 		connect(m_captureDlgMgr, &CaptureDlgMgr::sigCatchWidgetFinish, this, &ObjectHelper::onCatchWidgetFinish);
 

@@ -36,6 +36,10 @@ namespace Qth
 		QLineEdit* m_biEditRectY = nullptr;
 		QLineEdit* m_biEditRectWidth = nullptr;
 		QLineEdit* m_biEditRectHeight = nullptr;
+		QLineEdit* m_biEditMinWidth = nullptr;
+		QLineEdit* m_biEditMaxWidth = nullptr;
+		QLineEdit* m_biEditMinHeight = nullptr;
+		QLineEdit* m_biEditMaxHeight = nullptr;
 		QCheckBox* m_biCheckBoxVisible = nullptr;
 
 		// AttributeInfo
@@ -222,8 +226,8 @@ namespace Qth
 			createItemFunc(hLayout, d->m_biEditRectX, "TopLeftX:");
 			hLayout->addSpacing(8);
 			createItemFunc(hLayout, d->m_biEditRectY, "TopLeftY:");
-			d->m_biEditRectX->setValidator(new QIntValidator(-65536, 65536, d->m_biEditRectX));
-			d->m_biEditRectY->setValidator(new QIntValidator(-65536, 65536, d->m_biEditRectY));
+			d->m_biEditRectX->setValidator(new QIntValidator(-655360, 655360, d->m_biEditRectX));
+			d->m_biEditRectY->setValidator(new QIntValidator(-655360, 655360, d->m_biEditRectY));
 		}
 		gridLayout->addLayout(hLayout, row, 0);
 		hLayout = new QHBoxLayout();
@@ -233,8 +237,32 @@ namespace Qth
 			createItemFunc(hLayout, d->m_biEditRectWidth, "Width:");
 			hLayout->addSpacing(8);
 			createItemFunc(hLayout, d->m_biEditRectHeight, "Height:");
-			d->m_biEditRectWidth->setValidator(new QIntValidator(0, 65536, d->m_biEditRectWidth));
-			d->m_biEditRectHeight->setValidator(new QIntValidator(0, 65536, d->m_biEditRectHeight));
+			d->m_biEditRectWidth->setValidator(new QIntValidator(0, 655360, d->m_biEditRectWidth));
+			d->m_biEditRectHeight->setValidator(new QIntValidator(0, 655360, d->m_biEditRectHeight));
+		}
+		gridLayout->addLayout(hLayout, row, 1);
+
+		row = gridLayout->rowCount();
+		hLayout = new QHBoxLayout();
+		{
+			hLayout->setSpacing(0);
+			hLayout->setContentsMargins(0, 0, 0, 0);
+			createItemFunc(hLayout, d->m_biEditMinWidth, "MinWidth:");
+			hLayout->addSpacing(8);
+			createItemFunc(hLayout, d->m_biEditMaxWidth, "MaxWidth:");
+			d->m_biEditMinWidth->setValidator(new QIntValidator(-655360, 655360, d->m_biEditMinWidth));
+			d->m_biEditMaxWidth->setValidator(new QIntValidator(-655360, 655360, d->m_biEditMaxWidth));
+		}
+		gridLayout->addLayout(hLayout, row, 0);
+		hLayout = new QHBoxLayout();
+		{
+			hLayout->setSpacing(0);
+			hLayout->setContentsMargins(0, 0, 0, 0);
+			createItemFunc(hLayout, d->m_biEditMinHeight, "MinHeight:");
+			hLayout->addSpacing(8);
+			createItemFunc(hLayout, d->m_biEditMaxHeight, "MaxHeight:");
+			d->m_biEditMinHeight->setValidator(new QIntValidator(0, 655360, d->m_biEditMinHeight));
+			d->m_biEditMaxHeight->setValidator(new QIntValidator(0, 655360, d->m_biEditMaxHeight));
 		}
 		gridLayout->addLayout(hLayout, row, 1);
 
@@ -374,15 +402,13 @@ namespace Qth
 			return;
 
 		auto applyDataFunc = [=](QLineEdit* edit, std::function<QString()> getFunc, std::function<void(const QString&)> setFunc) {
-			if (edit)
-			{
+			if (edit) {
 				QString objectNameOld = getFunc();
 				QString objectNameNew = edit->text();
 				if (objectNameOld != objectNameNew)
 					setFunc(objectNameNew);
 			}
 		};
-
 		applyDataFunc(d->m_biEditObjName, std::bind(&QWidget::objectName, m_targetWidget), 
 			std::bind(&QWidget::setObjectName, m_targetWidget, std::placeholders::_1));
 		applyDataFunc(d->m_biEditTitle, std::bind(&QWidget::windowTitle, m_targetWidget),
@@ -420,6 +446,25 @@ namespace Qth
 			m_targetWidget->resize(frameRectNew.size());
 			m_targetWidget->move(frameRectNew.topLeft());
 		} while (false);	
+
+		// fixSize
+		bool fixSizeChanged = false;
+		auto applyFixSizeFunc = [&](QLineEdit* edit, std::function<int()> getFunc, std::function<void(int)> setFunc) {
+			if (edit) {
+				int len = edit->text().toInt();
+				if (len != getFunc()) {
+					setFunc(len);
+					fixSizeChanged = true;
+				}
+			}
+		};
+		applyFixSizeFunc(d->m_biEditMinWidth, std::bind(&QWidget::minimumWidth, m_targetWidget), std::bind(&QWidget::setMinimumWidth, m_targetWidget, std::placeholders::_1));
+		applyFixSizeFunc(d->m_biEditMaxWidth, std::bind(&QWidget::maximumWidth, m_targetWidget), std::bind(&QWidget::setMaximumWidth, m_targetWidget, std::placeholders::_1));
+		applyFixSizeFunc(d->m_biEditMinHeight, std::bind(&QWidget::minimumHeight, m_targetWidget), std::bind(&QWidget::setMinimumHeight, m_targetWidget, std::placeholders::_1));
+		applyFixSizeFunc(d->m_biEditMaxHeight, std::bind(&QWidget::minimumHeight, m_targetWidget), std::bind(&QWidget::setMaximumHeight, m_targetWidget, std::placeholders::_1));
+
+		if (fixSizeChanged)
+			updateBaseInfo(false);
 	}
 
 	void WidgetDetails::updateBaseInfo(bool showErrorMsg)
@@ -448,6 +493,11 @@ namespace Qth
 		setDataFunc(d->m_biEditRectY, valid ? QString::number(frameRect.y()) : "");
 		setDataFunc(d->m_biEditRectWidth, valid ? QString::number(frameRect.width()) : "");
 		setDataFunc(d->m_biEditRectHeight, valid ? QString::number(frameRect.height()) : "");
+
+		setDataFunc(d->m_biEditMinWidth, valid ? QString::number(m_targetWidget->minimumWidth()) : "");
+		setDataFunc(d->m_biEditMaxWidth, valid ? QString::number(m_targetWidget->maximumWidth()) : "");
+		setDataFunc(d->m_biEditMinHeight, valid ? QString::number(m_targetWidget->minimumHeight()) : "");
+		setDataFunc(d->m_biEditMaxHeight, valid ? QString::number(m_targetWidget->maximumHeight()) : "");
 
 		if (d->m_biCheckBoxVisible)
 			d->m_biCheckBoxVisible->setChecked(valid && m_targetWidget->isVisible());

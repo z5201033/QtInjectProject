@@ -42,33 +42,54 @@ LRESULT CALLBACK MainThreadMsgProc(int nCode, WPARAM wParam, LPARAM lParam)
 	return CallNextHookEx(g_hookMsg, nCode, wParam, lParam);
 }
 
-void RaiseWidgetHelper()
+void AutoWidgetHelperSetParent()
 {
-	for(QWidget* pwidget : QApplication::topLevelWidgets())
+	if (!g_WidgetHelper)
+		return;
+	auto pwidget = QApplication::activeModalWidget();
+	if (!pwidget)
 	{
-		if ((pwidget->isWindow()) && (pwidget->windowModality() == Qt::WindowModality::ApplicationModal))
+		for (QWidget* w : QApplication::topLevelWidgets())
 		{
-			if (g_WidgetHelper->parentWidget() == pwidget)
+			if (w->isModal())
+			{
+				pwidget = w;
 				break;
-
-			Qt::WindowFlags flags = g_WidgetHelper->windowFlags();
-			g_WidgetHelper->setParent(pwidget);
-			g_WidgetHelper->setWindowFlags(flags);
-			g_WidgetHelper->connect(pwidget, &QObject::destroyed, g_WidgetHelper, [&](QObject* parent) {
-				if (g_WidgetHelper->parent() == parent)
-				{
-					bool visible = g_WidgetHelper->isVisible();
-					QRect rectOld = g_WidgetHelper->geometry();
-					g_WidgetHelper->setParent(nullptr);
-					g_WidgetHelper->setGeometry(rectOld);
-					g_WidgetHelper->setVisible(visible);
-				}
-			});
-
-			break;
+			}
 		}
 	}
 
+	do
+	{
+		if (g_WidgetHelper->parentWidget() == pwidget)
+			break;
+
+		Qt::WindowFlags flags = g_WidgetHelper->windowFlags();
+		g_WidgetHelper->setParent(pwidget);
+		g_WidgetHelper->setWindowFlags(flags);
+		g_WidgetHelper->connect(pwidget, &QObject::destroyed, g_WidgetHelper, [&](QObject* parent) {
+			if (g_WidgetHelper->parent() == parent)
+			{
+				bool visible = g_WidgetHelper->isVisible();
+				QRect rectOld = g_WidgetHelper->geometry();
+				g_WidgetHelper->setParent(nullptr);
+				g_WidgetHelper->setGeometry(rectOld);
+				g_WidgetHelper->setVisible(visible);
+
+				QTimer::singleShot(100, g_WidgetHelper, [=]() {
+					AutoWidgetHelperSetParent();
+					g_WidgetHelper->show();
+				});
+			}
+		});
+	} while (false);
+}
+
+void RaiseWidgetHelper()
+{
+	if (!g_WidgetHelper)
+		return;
+	AutoWidgetHelperSetParent();
 	g_WidgetHelper->show();
 	g_WidgetHelper->raise();
 }
